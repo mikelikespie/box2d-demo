@@ -83,12 +83,9 @@ b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 		m_invMass = 1.0f / m_mass;
 	}
 
-	if ((m_flags & b2Body::e_fixedRotationFlag) == 0)
-	{
-		m_I = bd->massData.I;
-	}
+	m_I = bd->massData.I;
 	
-	if (m_I > 0.0f)
+	if (m_I > 0.0f && (m_flags & b2Body::e_fixedRotationFlag) == 0)
 	{
 		m_invI = 1.0f / m_I;
 	}
@@ -128,7 +125,7 @@ float32 connectEdges(b2EdgeShape * const & s1, b2EdgeShape * const & s2, float32
 	return angle2;
 }
 
-b2Shape* b2Body::CreateShape(b2ShapeDef* def)
+b2Shape* b2Body::CreateShape(const b2ShapeDef* def)
 {
 	b2Assert(m_world->m_lock == false);
 	if (m_world->m_lock == true)
@@ -141,7 +138,7 @@ b2Shape* b2Body::CreateShape(b2ShapeDef* def)
 	//       return more than one shape to add to parent body... maybe it should add
 	//       shapes directly to the body instead of returning them?)
 	if (def->type == e_edgeShape) {
-		b2EdgeChainDef* edgeDef = (b2EdgeChainDef*)def;
+		const b2EdgeChainDef* edgeDef = (const b2EdgeChainDef*)def;
 		b2Vec2 v1;
 		b2Vec2 v2;
 		int i;
@@ -257,12 +254,9 @@ void b2Body::SetMass(const b2MassData* massData)
 		m_invMass = 1.0f / m_mass;
 	}
 
-	if ((m_flags & b2Body::e_fixedRotationFlag) == 0)
-	{
-		m_I = massData->I;
-	}
+	m_I = massData->I;
 
-	if (m_I > 0.0f)
+	if (m_I > 0.0f && (m_flags & b2Body::e_fixedRotationFlag) == 0)
 	{
 		m_invI = 1.0f / m_I;
 	}

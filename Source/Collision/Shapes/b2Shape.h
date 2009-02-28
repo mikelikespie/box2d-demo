@@ -130,6 +130,10 @@ public:
 	/// @return the true if the shape is a sensor.
 	bool IsSensor() const;
 
+	/// Set if this shapes is a sensor.
+	/// You must call b2World::Refilter to update existing contacts.
+	void SetSensor(bool sensor);
+
 	/// Set the contact filtering data. You must call b2World::Refilter to correct
 	/// existing contacts/non-contacts.
 	void SetFilterData(const b2FilterData& filter);
@@ -266,6 +270,11 @@ inline b2ShapeType b2Shape::GetType() const
 inline bool b2Shape::IsSensor() const
 {
 	return m_isSensor;
+}
+
+inline void b2Shape::SetSensor(bool sensor)
+{
+	m_isSensor = sensor;
 }
 
 inline void b2Shape::SetFilterData(const b2FilterData& filter)
