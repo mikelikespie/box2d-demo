@@ -70,10 +70,24 @@ const float32 b2_pi = 3.14159265359f;
 ///
 
 // Collision
-const int32 b2_maxManifoldPoints = 2;
-const int32 b2_maxPolygonVertices = 8;
-const int32 b2_maxProxies = 512;				// this must be a power of two
-const int32 b2_maxPairs = 8 * b2_maxProxies;	// this must be a power of two
+
+/// The maximum number of contact points between two convex shapes.
+#define b2_maxManifoldPoints		2
+
+/// The maximum number of vertices on a convex polygon.
+#define b2_maxPolygonVertices		8
+
+/// Factor used to fatten AABBs in b2DynamicTree. This allows client
+/// objects to move a small amount without needing to adjust the tree.
+#define b2_fatAABBFactor			1.5f
+
+/// this must be a power of two
+#define b2_maxProxies				512
+
+// this must be a power of two
+#define b2_maxPairs					(8 * b2_maxProxies)
+
+
 
 // Dynamics
 
