@@ -187,6 +187,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Source\Collision\b2DynamicTree.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Source\Collision\b2DynamicTree.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Source\Collision\b2PairManager.cpp"
 				>
 			</File>

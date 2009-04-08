@@ -86,6 +86,36 @@ struct b2AABB
 	/// Verify that the bounds are sorted.
 	bool IsValid() const;
 
+	/// Get the center of the AABB.
+	b2Vec2 GetCenter() const
+	{
+		return 0.5f * (lowerBound + upperBound);
+	}
+
+	/// Get the extents of the AABB (half-widths).
+	b2Vec2 GetExtents() const
+	{
+		return 0.5f * (upperBound - lowerBound);
+	}
+
+	/// Combine two AABBs into this one.
+	void Combine(const b2AABB& aabb1, const b2AABB& aabb2)
+	{
+		lowerBound = b2Min(aabb1.lowerBound, aabb2.lowerBound);
+		upperBound = b2Max(aabb1.upperBound, aabb2.upperBound);
+	}
+
+	/// Does this aabb contain the provided AABB.
+	bool Contains(const b2AABB& aabb)
+	{
+		bool result = true;
+		result = result && lowerBound.x <= aabb.lowerBound.x;
+		result = result && lowerBound.y <= aabb.lowerBound.y;
+		result = result && aabb.upperBound.x <= upperBound.x;
+		result = result && aabb.upperBound.y <= upperBound.y;
+		return result;
+	}
+
 	b2Vec2 lowerBound;	///< the lower vertex
 	b2Vec2 upperBound;	///< the upper vertex
 };

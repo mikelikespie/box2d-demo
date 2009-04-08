@@ -81,6 +81,9 @@ const float32 b2_pi = 3.14159265359f;
 /// objects to move a small amount without needing to adjust the tree.
 #define b2_fatAABBFactor			1.5f
 
+/// The initial pool size for the dynamic tree.
+#define b2_nodePoolSize				50
+
 /// this must be a power of two
 #define b2_maxProxies				512
 
