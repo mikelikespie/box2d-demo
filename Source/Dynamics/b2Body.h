@@ -47,6 +47,8 @@ struct b2BodyDef
 		userData = NULL;
 		position.Set(0.0f, 0.0f);
 		angle = 0.0f;
+		linearVelocity.Set(0.0f, 0.0f);
+		angularVelocity = 0.0f;
 		linearDamping = 0.0f;
 		angularDamping = 0.0f;
 		allowSleep = true;
@@ -69,6 +71,12 @@ struct b2BodyDef
 
 	/// The world angle of the body in radians.
 	float32 angle;
+
+	/// The linear velocity of the body in world co-ordinates.
+	b2Vec2 linearVelocity;
+
+	/// The angular velocity of the body.
+	float32 angularVelocity;
 
 	/// Linear damping is use to reduce the linear velocity. The damping parameter
 	/// can be larger than 1.0f but the damping effect becomes sensitive to the
@@ -133,9 +141,26 @@ public:
 	/// body is automatically frozen.
 	bool SetXForm(const b2Vec2& position, float32 angle);
 
+	/// Set the position of the body's origin and rotation (radians).
+	/// This breaks any contacts and wakes the other bodies.
+	/// Note this is less efficient than the other overload - you should use that
+	/// if the angle is available.
+	/// @param xf the transform of position and angle to set the bdoy to.
+	/// @return false if the movement put a shape outside the world. In this case the
+	/// body is automatically frozen.
+	bool SetXForm(const b2XForm& xf);
+
 	/// Get the body transform for the body's origin.
 	/// @return the world transform of the body's origin.
 	const b2XForm& GetXForm() const;
+
+	/// Set the world body origin position.
+	/// @param position the new position of the body.
+	void SetPosition(const b2Vec2& position);
+
+	/// Set the world body angle.
+	/// @param angle the new angle of the body.
+	void SetAngle(float32 angle);
 
 	/// Get the world body origin position.
 	/// @return the world position of the body's origin.
@@ -194,6 +219,10 @@ public:
 	/// Get the central rotational inertia of the body.
 	/// @return the rotational inertia, usually in kg-m^2.
 	float32 GetInertia() const;
+
+	/// Get the mass data of the body.
+	/// @return a struct containing the mass, intertia and center of the body.
+	b2MassData GetMassData() const;
 
 	/// Get the world coordinates of a point given the local coordinates.
 	/// @param localPoint a point on the body measured relative the the body's origin.
@@ -390,6 +419,21 @@ inline const b2XForm& b2Body::GetXForm() const
 	return m_xf;
 }
 
+inline bool b2Body::SetXForm(const b2XForm& xf)
+{
+	return SetXForm(xf.position, xf.GetAngle());
+}
+
+inline void b2Body::SetPosition(const b2Vec2& position)
+{
+	SetXForm(position, GetAngle());
+}
+
+inline void b2Body::SetAngle(float32 angle)
+{
+	SetXForm(GetPosition(), angle);
+}
+
 inline const b2Vec2& b2Body::GetPosition() const
 {
 	return m_xf.position;
@@ -438,6 +482,15 @@ inline float32 b2Body::GetMass() const
 inline float32 b2Body::GetInertia() const
 {
 	return m_I;
+}
+
+inline b2MassData b2Body::GetMassData() const
+{
+	b2MassData massData;
+	massData.mass = m_mass;
+	massData.I = m_I;
+	massData.center = GetWorldCenter();
+	return massData;
 }
 
 inline b2Vec2 b2Body::GetWorldPoint(const b2Vec2& localPoint) const

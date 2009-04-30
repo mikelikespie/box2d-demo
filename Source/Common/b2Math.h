@@ -475,6 +475,12 @@ struct b2XForm
 		R.SetIdentity();
 	}
 
+	/// Calculate the angle that the rotation matrix represents.
+	float32 GetAngle() const
+	{
+		return b2Atan2(R.col1.y, R.col1.x);
+	}
+
 	b2Vec2 position;
 	b2Mat22 R;
 };
