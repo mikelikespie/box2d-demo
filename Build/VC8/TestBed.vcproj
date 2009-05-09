@@ -294,6 +294,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Examples\TestBed\Tests\DynamicTreeTest.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Examples\TestBed\Tests\ElasticBody.h"
 				>
 			</File>

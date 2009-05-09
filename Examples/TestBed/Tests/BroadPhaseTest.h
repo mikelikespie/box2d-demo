@@ -22,23 +22,8 @@
 #include "../Framework/Test.h"
 #include "../Framework/Render.h"
 
-#ifdef __APPLE__
-#include <GLUT/glut.h>
-#else
-#include "freeglut/GL/glut.h"
-#endif
-
-const int32 k_actorCount = 256;
-const float32 k_extent = 15.0f;
 
 class BroadPhaseTest;
-
-struct Actor
-{
-	b2AABB aabb;
-	int32 overlapCount;
-	uint16 proxyId;
-};
 
 class Callback : public b2PairCallback
 {
@@ -53,12 +38,24 @@ public:
 class BroadPhaseTest : public Test
 {
 public:
+	enum
+	{
+		e_actorCount = 256,
+	};
+
+	struct Actor
+	{
+		b2AABB aabb;
+		int32 overlapCount;
+		uint16 proxyId;
+	};
+
 	static Test* Create();
 
 	BroadPhaseTest();
 	~BroadPhaseTest();
 
-	float GetExtent() { return 1.5f * k_extent; }
+	float GetExtent() { return 1.5f * m_extent; }
 	void Step(Settings* settings);
 
 	void Keyboard(unsigned char key);
@@ -67,19 +64,24 @@ private:
 
 	friend class Callback;
 
+	void GetRandomAABB(b2AABB* aabb);
+	void MoveAABB(b2AABB* aabb);
+
 	void CreateProxy();
 	void DestroyProxy();
 	void MoveProxy();
 	void Action();
 	void Validate();
 
+	float32 m_extent;
+
 	int32 m_overlapCount;
 	int32 m_overlapCountExact;
 
 	Callback m_callback;
 	b2BroadPhase* m_broadPhase;
-	Actor m_actors[k_actorCount];
-	bool m_overlaps[k_actorCount][k_actorCount];
+	Actor m_actors[e_actorCount];
+	bool m_overlaps[e_actorCount][e_actorCount];
 	bool m_automated;
 	int32 m_stepCount;
 };

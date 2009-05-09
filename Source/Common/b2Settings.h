@@ -155,7 +155,7 @@ const float32 b2_timeToSleep = 0.5f;									// half a second
 const float32 b2_linearSleepTolerance = 0.01f;		// 1 cm/s
 
 /// A body cannot sleep if its angular velocity is above this tolerance.
-const float32 b2_angularSleepTolerance = 2.0f / 180.0f;		// 2 degrees/s
+const float32 b2_angularSleepTolerance = 2.0f / 180.0f * b2_pi;		// 2 degrees/s
 
 // Memory Allocation
 

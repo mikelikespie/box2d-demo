@@ -70,6 +70,21 @@ struct b2Manifold
 	int32 pointCount;	///< the number of manifold points
 };
 
+/// Ray-cast input data.
+struct b2RayCastInput
+{
+	b2Vec2 p1, p2;
+	float32 maxFraction;
+};
+
+/// Ray-cast output data.
+struct b2RayCastOutput
+{
+	b2Vec2 normal;
+	float32 fraction;
+	bool hit;
+};
+
 /// A line segment.
 struct b2Segment
 {
@@ -115,6 +130,8 @@ struct b2AABB
 		result = result && aabb.upperBound.y <= upperBound.y;
 		return result;
 	}
+
+	void RayCast(b2RayCastOutput* output, const b2RayCastInput& input);
 
 	b2Vec2 lowerBound;	///< the lower vertex
 	b2Vec2 upperBound;	///< the upper vertex

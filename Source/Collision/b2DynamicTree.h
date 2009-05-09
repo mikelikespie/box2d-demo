@@ -21,24 +21,22 @@
 
 #include "b2Collision.h"
 
+#define b2_nullNode USHRT_MAX
+
 /// A node in the dynamic tree. The client does not interact with this directly.
+/// 4 + 8 + 6 = 18 bytes on a 32bit machine.
 struct b2DynamicTreeNode
 {
-	// TODO_ERIN add filtering?
-
 	bool IsLeaf() const
 	{
-		return children[1] == NULL;
+		return child1 == b2_nullNode;
 	}
 
+	void* userData;
 	b2AABB aabb;
-	b2DynamicTreeNode* parent;
-
-	union
-	{
-		b2DynamicTreeNode* children[2];
-		void* userData;
-	};
+	uint16 parent;
+	uint16 child1;
+	uint16 child2;
 };
 
 /// A callback for AABB queries.
@@ -50,13 +48,6 @@ public:
 	/// This function is called for each overlapping AABB.
 	/// @return true if the query should continue.
 	virtual bool Process(void* userData) = 0;
-};
-
-/// Ray-cast input data.
-struct b2RayCastInput
-{
-	b2Vec2 p1, p2;
-	float32 maxFraction;
 };
 
 /// A callback for ray casts.
@@ -80,8 +71,12 @@ public:
 /// with an AABB. In the tree we expand the proxy AABB by b2_fatAABBFactor
 /// so that the proxy AABB is bigger than the client object. This allows the client
 /// object to move by small amounts without triggering a tree update.
+///
+/// Nodes are pooled and relocatable, so we use node indices rather than pointers.
 class b2DynamicTree
 {
+public:
+
 	/// Constructing the tree initializes the node pool.
 	b2DynamicTree();
 
@@ -89,22 +84,22 @@ class b2DynamicTree
 	~b2DynamicTree();
 
 	/// Create a proxy. Provide a tight fitting AABB and a userData pointer.
-	int32 CreateProxy(const b2AABB& aabb, void* userData);
+	uint16 CreateProxy(const b2AABB& aabb, void* userData);
 
 	/// Destroy a proxy. This asserts if the id is invalid.
-	void DestroyProxy(int32 proxyId);
+	void DestroyProxy(uint16 proxyId);
 
 	/// Move a proxy. If the proxy has moved outside of its fattened AABB,
 	/// then the proxy is removed from the tree and re-inserted. Otherwise
 	/// the function returns immediately.
-	void MoveProxy(int32 proxyId, const b2AABB& aabb);
+	void MoveProxy(uint16 proxyId, const b2AABB& aabb);
 
-	/// Perform some iterations to rebalance the tree.
+	/// Perform some iterations to re-balance the tree.
 	void Rebalance(int32 iterations);
 
 	/// Get proxy user data.
 	/// @return the proxy user data or NULL if the id is invalid.
-	void* GetProxy(int32 proxyId);
+	void* GetProxy(uint16 proxyId);
 
 	/// Query an AABB for overlapping proxies. The callback class
 	/// is called for each proxy that overlaps the supplied AABB.
@@ -123,20 +118,20 @@ class b2DynamicTree
 
 private:
 
-	b2DynamicTreeNode* AllocateNode();
-	void FreeNode(b2DynamicTreeNode* node);
+	uint16 AllocateNode();
+	void FreeNode(uint16 node);
 
-	void InsertLeaf(b2DynamicTreeNode* node);
-	void RemoveLeaf(b2DynamicTreeNode* node);
+	void InsertLeaf(uint16 node);
+	void RemoveLeaf(uint16 node);
 
-	b2DynamicTreeNode* m_root;
+	uint16 m_root;
 
-	b2DynamicTreeNode* m_pool;
-	int32 m_poolCount;
+	b2DynamicTreeNode* m_nodes;
+	int32 m_nodeCount;
 
-	b2DynamicTreeNode* m_freeList;
+	uint16 m_freeList;
 
-	/// This is used incrementally traverse the tree for rebalancing.
+	/// This is used incrementally traverse the tree for re-balancing.
 	uint32 m_path;
 };
 
@@ -149,26 +144,26 @@ inline void b2DynamicTree::Query(T* callback, const b2AABB& aabb) const
 	}
 
 	const int32 k_stackSize = 32;
-	const b2DynamicTreeNode* stack[k_stackSize];
+	uint16 stack[k_stackSize];
 
 	int32 count = 0;
 	stack[count++] = m_root;
 
 	while (count > 0)
 	{
-		const b2DynamicTreeNode* node = stack[--count];
+		const b2DynamicTreeNode* node = m_nodes + stack[--count];
 
 		if (b2TestOverlap(node->aabb, aabb))
 		{
 			if (node->IsLeaf())
 			{
-				callback->Process(node->userData);
+				callback->QueryCallback(aabb, node->userData);
 			}
 			else
 			{
 				b2Assert(count + 1 < k_stackSize);
-				stack[count++] = node->children[0];
-				stack[count++] = node->children[1];
+				stack[count++] = node->child1;
+				stack[count++] = node->child2;
 			}
 		}
 	}
@@ -206,16 +201,16 @@ inline void b2DynamicTree::RayCast(T* callback, const b2RayCastInput& input) con
 	}
 
 	const int32 k_stackSize = 32;
-	b2DynamicTreeNode* stack[k_stackSize];
+	uint16 stack[k_stackSize];
 
 	int32 count = 0;
 	stack[count++] = m_root;
 
 	while (count > 0)
 	{
-		const b2DynamicTreeNode* node = stack[--count];
+		const b2DynamicTreeNode* node = m_nodes + stack[--count];
 
-		if (b2TestOverlap(node->aabb, segmentAABB) == FALSE)
+		if (b2TestOverlap(node->aabb, segmentAABB) == false)
 		{
 			continue;
 		}
@@ -224,47 +219,47 @@ inline void b2DynamicTree::RayCast(T* callback, const b2RayCastInput& input) con
 		// |dot(v, p1 - c)| > dot(|v|, h)
 		b2Vec2 c = node->aabb.GetCenter();
 		b2Vec2 h = node->aabb.GetExtents();
-		float32 separation = b2Abs(b2Dot(v, p1 - c)) - b2Dot(abs_v, h)
-			if (separation > 0.0f)
+		float32 separation = b2Abs(b2Dot(v, p1 - c)) - b2Dot(abs_v, h);
+		if (separation > 0.0f)
+		{
+			continue;
+		}
+
+		if (node->IsLeaf())
+		{
+			b2RayCastInput subInput;
+			subInput.p1 = input.p1;
+			subInput.p2 = input.p2;
+			subInput.maxFraction = maxFraction;
+
+			b2RayCastOutput output;
+
+			callback->RayCastCallback(&output, subInput, node->userData);
+
+			if (output.hit)
 			{
-				continue;
-			}
-
-			if (node->IsLeaf())
-			{
-				b2RayCastInput i;
-				i.p1 = input.p1;
-				i.p2 = input.p2;
-				i.maxFraction = maxFraction;
-
-				float32 newFraction = callback->Process(i, node->userData);
-
-				if (newFraction != maxFraction)
+				// Early exit.
+				if (output.fraction == 0.0f)
 				{
-					b2Assert(newFraction < maxFraction);
+					return;
+				}
 
-					// Early exit.
-					if (newFraction == 0.0f)
-					{
-						return;
-					}
+				maxFraction = output.fraction;
 
-					maxFraction = newFraction;
-
-					// Update segment bounding box.
-					{
-						b2Vec2 t = p1 + maxFraction * (p2 - p1);
-						segmentAABB.lowerBound = b2Min(p1, t);
-						segmentAABB.upperBound = b2Max(p1, t);
-					}
+				// Update segment bounding box.
+				{
+					b2Vec2 t = p1 + maxFraction * (p2 - p1);
+					segmentAABB.lowerBound = b2Min(p1, t);
+					segmentAABB.upperBound = b2Max(p1, t);
 				}
 			}
-			else
-			{
-				b2Assert(count + 1 < k_stackSize);
-				stack[count++] = node->children[0];
-				stack[count++] = node->children[1];
-			}
+		}
+		else
+		{
+			b2Assert(count + 1 < k_stackSize);
+			stack[count++] = node->child1;
+			stack[count++] = node->child2;
+		}
 	}
 }
 

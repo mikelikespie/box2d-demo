@@ -41,6 +41,7 @@
 #include "DistanceTest.h"
 #include "Dominos.h"
 #include "DynamicEdges.h"
+#include "DynamicTreeTest.h"
 #include "ElasticBody.h"
 #include "Gears.h"
 #include "LineJoint.h"
@@ -67,6 +68,7 @@
 
 TestEntry g_testEntries[] =
 {
+	{"Dynamic Tree", DynamicTreeTest::Create},
 	{"Static Edges", StaticEdges::Create},
 	{"Pyramid And Static Edges", PyramidStaticEdges::Create},
 	{"Dynamic Edges", DynamicEdges::Create},

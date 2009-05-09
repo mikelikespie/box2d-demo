@@ -198,7 +198,11 @@ void Test::SpawnBomb(const b2Vec2& worldPt)
     
 void Test::CompleteBombSpawn(const b2Vec2& p)
 {
-	if (!m_bombSpawning) return;
+	if (m_bombSpawning == false)
+	{
+		return;
+	}
+
 	const float multiplier = 30.0f;
 	b2Vec2 vel = m_bombSpawnPoint - p;
 	vel *= multiplier;
@@ -367,7 +371,8 @@ void Test::Step(Settings* settings)
 		glEnd();
 	}
 	
-	if (m_bombSpawning){
+	if (m_bombSpawning)
+	{
 		glPointSize(4.0f);
 		glColor3f(0.0f, 0.0f, 1.0f);
 		glBegin(GL_POINTS);

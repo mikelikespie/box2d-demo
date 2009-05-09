@@ -125,6 +125,18 @@ struct b2Vec2
 	/// Negate this vector.
 	b2Vec2 operator -() const { b2Vec2 v; v.Set(-x, -y); return v; }
 	
+	/// Read from and indexed element.
+	float32 operator () (int32 i) const
+	{
+		return (&x)[i];
+	}
+
+	/// Write to an indexed element.
+	float32& operator () (int32 i)
+	{
+		return (&x)[i];
+	}
+
 	/// Add a vector to this vector.
 	void operator += (const b2Vec2& v)
 	{
