@@ -127,19 +127,13 @@ const float32 b2_maxAngularCorrection = 8.0f / 180.0f * b2_pi;			// 8 degrees
 
 /// The maximum linear velocity of a body. This limit is very large and is used
 /// to prevent numerical problems. You shouldn't need to adjust this.
-#ifdef TARGET_FLOAT32_IS_FIXED
-const float32 b2_maxLinearVelocity = 100.0f;
-#else
-const float32 b2_maxLinearVelocity = 200.0f;
-const float32 b2_maxLinearVelocitySquared = b2_maxLinearVelocity * b2_maxLinearVelocity;
-#endif
+#define b2_maxTranslation 2.0f
+#define b2_maxTranslationSquared (b2_maxTranslation * b2_maxTranslation)
 
 /// The maximum angular velocity of a body. This limit is very large and is used
 /// to prevent numerical problems. You shouldn't need to adjust this.
-const float32 b2_maxAngularVelocity = 250.0f;
-#ifndef TARGET_FLOAT32_IS_FIXED
-const float32 b2_maxAngularVelocitySquared = b2_maxAngularVelocity * b2_maxAngularVelocity;
-#endif
+#define b2_maxRotation (0.5f * b2_pi)
+#define b2_maxRotationSquared (b2_maxRotation * b2_maxRotation)
 
 /// This scale factor controls how fast overlap is resolved. Ideally this would be 1 so
 /// that overlap is removed in one time step. However using values close to 1 often lead

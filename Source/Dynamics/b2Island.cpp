@@ -205,38 +205,6 @@ void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSl
 		b->m_linearVelocity *= b2Clamp(1.0f - step.dt * b->m_linearDamping, 0.0f, 1.0f);
 		b->m_angularVelocity *= b2Clamp(1.0f - step.dt * b->m_angularDamping, 0.0f, 1.0f);
 
-		// Check for large velocities.
-#ifdef TARGET_FLOAT32_IS_FIXED
-		// Fixed point code written this way to prevent
-		// overflows, float code is optimized for speed
-
-		float32 vMagnitude = b->m_linearVelocity.Length();
-		if(vMagnitude > b2_maxLinearVelocity) {
-			b->m_linearVelocity *= b2_maxLinearVelocity/vMagnitude;
-		}
-		b->m_angularVelocity = b2Clamp(b->m_angularVelocity, 
-			-b2_maxAngularVelocity, b2_maxAngularVelocity);
-
-#else
-
-		if (b2Dot(b->m_linearVelocity, b->m_linearVelocity) > b2_maxLinearVelocitySquared)
-		{
-			b->m_linearVelocity.Normalize();
-			b->m_linearVelocity *= b2_maxLinearVelocity;
-		}
-		if (b->m_angularVelocity * b->m_angularVelocity > b2_maxAngularVelocitySquared)
-		{
-			if (b->m_angularVelocity < 0.0f)
-			{
-				b->m_angularVelocity = -b2_maxAngularVelocity;
-			}
-			else
-			{
-				b->m_angularVelocity = b2_maxAngularVelocity;
-			}
-		}
-#endif
-
 	}
 
 	b2ContactSolver contactSolver(step, m_contacts, m_contactCount, m_allocator);
@@ -270,6 +238,27 @@ void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSl
 
 		if (b->IsStatic())
 			continue;
+
+		// Check for large velocities.
+		b2Vec2 translation = step.dt * b->m_linearVelocity;
+		if (b2Dot(translation, translation) > b2_maxTranslationSquared)
+		{
+			translation.Normalize();
+			b->m_linearVelocity = (b2_maxTranslation * step.inv_dt) * translation;
+		}
+
+		float32 rotation = step.dt * b->m_angularVelocity;
+		if (rotation * rotation > b2_maxRotationSquared)
+		{
+			if (rotation < 0.0)
+			{
+				b->m_angularVelocity = -step.inv_dt * b2_maxRotation;
+			}
+			else
+			{
+				b->m_angularVelocity = step.inv_dt * b2_maxRotation;
+			}
+		}
 
 		// Store positions for continuous collision.
 		b->m_sweep.c0 = b->m_sweep.c;
@@ -395,6 +384,27 @@ void b2Island::SolveTOI(b2TimeStep& subStep)
 
 		if (b->IsStatic())
 			continue;
+
+		// Check for large velocities.
+		b2Vec2 translation = subStep.dt * b->m_linearVelocity;
+		if (b2Dot(translation, translation) > b2_maxTranslationSquared)
+		{
+			translation.Normalize();
+			b->m_linearVelocity = (b2_maxTranslation * subStep.inv_dt) * translation;
+		}
+
+		float32 rotation = subStep.dt * b->m_angularVelocity;
+		if (rotation * rotation > b2_maxRotationSquared)
+		{
+			if (rotation < 0.0)
+			{
+				b->m_angularVelocity = -subStep.inv_dt * b2_maxRotation;
+			}
+			else
+			{
+				b->m_angularVelocity = subStep.inv_dt * b2_maxRotation;
+			}
+		}
 
 		// Store positions for continuous collision.
 		b->m_sweep.c0 = b->m_sweep.c;

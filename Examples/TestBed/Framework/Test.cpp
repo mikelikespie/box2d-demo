@@ -108,7 +108,7 @@ Test::Test()
 	m_worldAABB.upperBound.Set(200.0f, 200.0f);
 	b2Vec2 gravity;
 	gravity.Set(0.0f, -10.0f);
-	bool doSleep = true;
+	bool doSleep = false;
 	m_world = new b2World(m_worldAABB, gravity, doSleep);
 	m_bomb = NULL;
 	m_textLine = 30;
@@ -124,6 +124,8 @@ Test::Test()
 	m_world->SetDebugDraw(&m_debugDraw);
 	
 	m_bombSpawning = false;
+
+	m_stepCount = 0;
 }
 
 Test::~Test()
@@ -325,7 +327,17 @@ void Test::Step(Settings* settings)
 
 	m_pointCount = 0;
 
+	if (m_stepCount == 18)
+	{
+		m_stepCount += 0;
+	}
+
 	m_world->Step(timeStep, settings->velocityIterations, settings->positionIterations);
+
+	if (timeStep > 0.0f)
+	{
+		++m_stepCount;
+	}
 
 	m_world->Validate();
 

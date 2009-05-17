@@ -50,6 +50,25 @@ b2Vec2 b2Mat33::Solve22(const b2Vec2& b) const
 	return x;
 }
 
+void b2Sweep::GetXForm2(b2XForm* xf, float32 alpha) const
+{
+	// center = p + R * localCenter
+	if (1.0f - t0 > B2_FLT_EPSILON)
+	{
+		xf->position = (1.0f - alpha) * c0 + alpha * c;
+		float32 angle = (1.0f - alpha) * a0 + alpha * a;
+		xf->R.Set(angle);
+	}
+	else
+	{
+		xf->position = c;
+		xf->R.Set(a);
+	}
+
+	// Shift to origin
+	xf->position -= b2Mul(xf->R, localCenter);
+}
+
 void b2Sweep::GetXForm(b2XForm* xf, float32 t) const
 {
 	// center = p + R * localCenter

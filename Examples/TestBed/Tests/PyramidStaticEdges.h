@@ -60,11 +60,13 @@ public:
 			b2Vec2 deltaX(0.5625f, 2.0f);
 			b2Vec2 deltaY(1.125f, 0.0f);
 
-			for (int32 i = 0; i < 25; ++i)
+			const int32 N = 2;
+
+			for (int32 i = 0; i < N; ++i)
 			{
 				y = x;
 
-				for (int32 j = i; j < 25; ++j)
+				for (int32 j = i; j < N; ++j)
 				{
 					b2BodyDef bd;
 					bd.position = y;

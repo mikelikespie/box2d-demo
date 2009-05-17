@@ -24,59 +24,25 @@ class DistanceTest : public Test
 public:
 	DistanceTest()
 	{
-#if 0
 		{
-			b2PolygonDef sd;
-			sd.SetAsBox(50.0f, 10.0f);
-			sd.friction = 0.3f;
-			m_shape1 = m_world->CreateShape(&sd);
-
 			b2BodyDef bd;
-			bd.position.Set(0.0f, -10.0f);
-			body->Create(m_shape1);
+			bd.position.Set(0.0f, 20.0f);
 			m_body1 = m_world->CreateBody(&bd);
-		}
-#else
-		{
-			b2PolygonDef sd;
-			sd.SetAsBox(1.0f, 1.0f);
-			sd.density = 0.0f;
 
-			b2BodyDef bd;
-			bd.position.Set(0.0f, 10.0f);
-			m_body1 = m_world->CreateBody(&bd);
+			b2PolygonDef sd;
+			sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
 			m_shape1 = m_body1->CreateShape(&sd);
 		}
-#endif
 
 		{
-#if 0
-			b2PolygonDef sd;
-			float32 a = 0.25f;
-			sd.SetAsBox(a, a);
-			sd.density = 1.0f;
-#elif 0
-			b2CircleDef sd;
-			sd.radius = 0.5f;
-			sd.density = 1.0f;
-#else
-			b2PolygonDef sd;
-			sd.vertexCount = 3;
-			sd.vertices[0].Set(-1.0f, 0.0f);
-			sd.vertices[1].Set(1.0f, 0.0f);
-			sd.vertices[2].Set(0.0f, 15.0f);
-			sd.density = 1.0f;
-#endif
 			b2BodyDef bd;
-#if 0
-			bd.position.Set(-48.377853f, 0.49244255f);
-			bd.rotation = 90.475891f;
-#else
-			bd.position.Set(0.0f, 10.0f);
-#endif
+			bd.position.Set(-9.1892055008530633f, 17.037377814153160f);
+			bd.angle = -34.723153436328857f;
 			m_body2 = m_world->CreateBody(&bd);
+
+			b2PolygonDef sd;
+			sd.SetAsBox(0.1f, 4.0f);
 			m_shape2 = m_body2->CreateShape(&sd);
-			m_body2->SetMassFromShapes();
 		}
 
 		m_world->SetGravity(b2Vec2(0.0f, 0.0f));
@@ -93,12 +59,7 @@ public:
 
 	void Step(Settings* settings)
 	{
-		int32 positionIterations = settings->positionIterations;
-		settings->positionIterations = 0;
-		settings->pause = 1;
 		Test::Step(settings);
-		settings->positionIterations = positionIterations;
-		settings->pause = 0;
 
 		b2Vec2 x1, x2;
 		float32 distance = b2Distance(&x1, &x2, m_shape1, m_body1->GetXForm(), m_shape2, m_body2->GetXForm());

@@ -25,36 +25,36 @@ public:
 
 	CCDTest()
 	{
-#if 0
-		m_world->m_gravity.SetZero();
-
+#if 1
 		{
 			b2PolygonDef sd;
-			sd.SetAsBox(0.1f, 10.0f);
+			sd.SetAsBox(10.0f, 0.2f);
 			sd.density = 0.0f;
 
 			b2BodyDef bd;
-			bd.position.Set(0.0f, 20.0f);
+			bd.position.Set(0.0f, -0.2f);
 			b2Body* body = m_world->CreateBody(&bd);
 			body->CreateShape(&sd);
+
+			//sd.SetAsBox(0.2f, 1.0f, b2Vec2(0.5f, 1.2f), 0.0f);
+			//body->CreateShape(&sd);
 		}
 
 		{
 			b2PolygonDef sd;
-			sd.SetAsBox(0.1f, 2.0f);
+			sd.SetAsBox(2.0f, 0.1f);
 			sd.density = 1.0f;
 			sd.restitution = 0.0f;
 
 			m_angularVelocity = RandomFloat(-50.0f, 50.0f);
-			//m_angularVelocity = 8.5009336f;
+			//m_angularVelocity = -2.0126967f;
 
 			b2BodyDef bd;
-			bd.type = b2BodyDef::e_dynamicBody;
-			bd.position.Set(50.0f, 20.0f);
+			bd.position.Set(00.0f, 20.0f);
 			b2Body* body = m_world->CreateBody(&bd);
 			body->CreateShape(&sd);
 			body->SetMassFromShapes();
-			body->SetLinearVelocity(b2Vec2(-200.0f, 0.0f));
+			body->SetLinearVelocity(b2Vec2(0.0f, -100.0f));
 			body->SetAngularVelocity(m_angularVelocity);
 		}
 #elif 0
@@ -162,7 +162,7 @@ public:
 			body->CreateShape(&sd_right);
 			body->SetMassFromShapes();
 		}
-#elif 1
+#elif 0
 		{
 			b2PolygonDef sd_bottom;
 			sd_bottom.SetAsBox( 1.5f, 0.15f );
@@ -187,7 +187,6 @@ public:
 #else
 		{
 			b2BodyDef bd;
-			bd.type = b2BodyDef::e_dynamic;
 			bd.position.Set(-5.0f, 20.0f);
 			bd.isBullet = true;
 			b2Body* body = m_world->CreateBody(&bd);
@@ -218,6 +217,24 @@ public:
 			body->SetMassFromShapes();
 		}
 #endif
+
+		m_stepCount = 0;
+	}
+
+	void Step(Settings* settings)
+	{
+		if (m_stepCount == 11182)
+		{
+			m_stepCount += 0;
+		}
+
+		Test::Step(settings);
+
+		extern int32 b2_maxToiIters, b2_maxToiRootIters;
+		m_debugDraw.DrawString(5, m_textLine, "max toi iters = %d, max root iters = %d", b2_maxToiIters, b2_maxToiRootIters);
+		m_textLine += 15;
+
+		++m_stepCount;
 	}
 
 	static Test* Create()
@@ -225,6 +242,7 @@ public:
 		return new CCDTest;
 	}
 
+	int32 m_stepCount;
 	float32 m_angularVelocity;
 };
 

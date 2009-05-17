@@ -504,7 +504,11 @@ struct b2XForm
 struct b2Sweep
 {
 	/// Get the interpolated transform at a specific time.
-	/// @param t the normalized time in [0,1].
+	/// @param alpha is a factor in [0,1], where 0 indicates t0.
+	void GetXForm2(b2XForm* xf, float32 alpha) const;
+
+	/// Get the interpolated transform at a specific time.
+	/// @param t is a factor in [t0,1]
 	void GetXForm(b2XForm* xf, float32 t) const;
 
 	/// Advance the sweep forward, yielding a new initial state.

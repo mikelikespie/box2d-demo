@@ -28,10 +28,12 @@ public:
 			b2PolygonDef sd;
 			sd.density = 0.0f;
 
-			sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
+			//sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
+			sd.SetAsBox(0.1f, 10.0f);
 
 			b2BodyDef bd;
-			bd.position.Set(0.0f, 20.0f);
+			//bd.position.Set(0.0f, 20.0f);
+			bd.position.Set(0.0f, 10.0f);
 			bd.angle = 0.0f;
 			m_body1 = m_world->CreateBody(&bd);
 			m_shape1 = m_body1->CreateShape(&sd);
@@ -39,12 +41,14 @@ public:
 
 		{
 			b2PolygonDef sd;
-			sd.SetAsBox(0.25f, 0.25f);
+			sd.SetAsBox(0.25f, 0.5f);
 			sd.density = 1.0f;
 
 			b2BodyDef bd;
-			bd.position.Set(9.6363468f, 28.050615f);
-			bd.angle = 1.6408679f;
+			//bd.position.Set(9.6363468f, 28.050615f);
+			//bd.angle = 1.6408679f;
+			bd.position.Set(-1.0f, 10.0f);
+			bd.angle = 0.0f;
 			m_body2 = m_world->CreateBody(&bd);
 			m_shape2 = (b2PolygonShape*)m_body2->CreateShape(&sd);
 			m_body2->SetMassFromShapes();
@@ -67,7 +71,8 @@ public:
 		settings->pause = 0;
 
 		b2Sweep sweep1;
-		sweep1.c0.Set(0.0f, 20.0f);
+		//sweep1.c0.Set(0.0f, 20.0f);
+		sweep1.c0.Set(0.0f, 0.0f);
 		sweep1.a0 = 0.0f;
 		sweep1.c = sweep1.c0;
 		sweep1.a = sweep1.a0;
@@ -75,10 +80,14 @@ public:
 		sweep1.localCenter = m_body1->GetLocalCenter();
 
 		b2Sweep sweep2;
-		sweep2.c0.Set(9.6363468f, 28.050615f);
-		sweep2.a0 = 1.6408679f;
-		sweep2.c = sweep2.c0 + b2Vec2(-0.075121880f, 0.27358246f);
-		sweep2.a = sweep2.a0 - 10.434675f;
+		//sweep2.c0.Set(9.6363468f, 28.050615f);
+		//sweep2.a0 = 1.6408679f;
+		//sweep2.c = sweep2.c0 + b2Vec2(-0.075121880f, 0.27358246f);
+		//sweep2.a = sweep2.a0 - 10.434675f;
+		sweep2.c0.Set(-1.0f, 10.0f);
+		sweep2.a0 = 0.0f;
+		sweep2.c.Set(1.0f, 10.0f);
+		sweep2.a = 1.0f;
 		sweep2.t0 = 0.0f;
 		sweep2.localCenter = m_body2->GetLocalCenter();
 

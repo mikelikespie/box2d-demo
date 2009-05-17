@@ -237,15 +237,16 @@ float32 DistanceGeneric(b2Vec2* x1, b2Vec2* x2,
 			maxSqr = b2Max(maxSqr, b2Dot(points[i], points[i]));
 		}
 
+		v = *x2 - *x1;
+		vSqr = b2Dot(v, v);
+
 #ifdef TARGET_FLOAT32_IS_FIXED
 		if (pointCount == 3 || vSqr <= 5.0*B2_FLT_EPSILON * maxSqr)
 #else
-		if (vSqr <= 100.0f * B2_FLT_EPSILON * maxSqr)
+		if (vSqr <= 100.0f * B2_FLT_EPSILON * maxSqr && vSqr < B2_FLT_EPSILON * B2_FLT_EPSILON)
 #endif
 		{
 			g_GJK_Iterations = iter;
-			v = *x2 - *x1;
-			vSqr = b2Dot(v, v);
 			return b2Sqrt(vSqr);
 		}
 	}

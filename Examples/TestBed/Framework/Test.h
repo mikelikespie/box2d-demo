@@ -173,7 +173,6 @@ public:
 	void SpawnBomb(const b2Vec2& worldPt);
 	void CompleteBombSpawn(const b2Vec2& p);
 
-
 	// Let derived tests know that a joint was destroyed.
 	virtual void JointDestroyed(b2Joint* joint) { B2_NOT_USED(joint); }
 	virtual void BoundaryViolated(b2Body* body) { B2_NOT_USED(body); }
@@ -198,6 +197,7 @@ protected:
 	b2Vec2 m_bombSpawnPoint;
 	bool m_bombSpawning;
 	b2Vec2 m_mouseWorld;
+	int32 m_stepCount;
 };
 
 #endif

@@ -68,9 +68,10 @@
 
 TestEntry g_testEntries[] =
 {
+	{"Pyramid And Static Edges", PyramidStaticEdges::Create},
+	{"CCD Test", CCDTest::Create},
 	{"Dynamic Tree", DynamicTreeTest::Create},
 	{"Static Edges", StaticEdges::Create},
-	{"Pyramid And Static Edges", PyramidStaticEdges::Create},
 	{"Dynamic Edges", DynamicEdges::Create},
 	{"Line Joint", LineJoint::Create},
 	{"SphereStack", SphereStack::Create},
@@ -88,7 +89,6 @@ TestEntry g_testEntries[] =
 	{"Varying Friction", VaryingFriction::Create},
 	{"Varying Restitution", VaryingRestitution::Create},
 	{"Dominos", Dominos::Create},
-	{"CCD Test", CCDTest::Create},
 	{"Biped Test", BipedTest::Create},
 	{"Car", Car::Create},
 	{"Gears", Gears::Create},
