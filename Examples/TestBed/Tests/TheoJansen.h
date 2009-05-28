@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -76,8 +76,8 @@ public:
 		b2Body* body1 = m_world->CreateBody(&bd1);
 		b2Body* body2 = m_world->CreateBody(&bd2);
 
-		body1->CreateShape(&sd1);
-		body2->CreateShape(&sd2);
+		body1->CreateFixture(&sd1);
+		body2->CreateFixture(&sd2);
 
 		body1->SetMassFromShapes();
 		body2->SetMassFromShapes();
@@ -122,13 +122,13 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -10.0f);
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 
 			sd.SetAsBox(0.5f, 5.0f, b2Vec2(-50.0f, 15.0f), 0.0f);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 
 			sd.SetAsBox(0.5f, 5.0f, b2Vec2(50.0f, 15.0f), 0.0f);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		for (int32 i = 0; i < 40; ++i)
@@ -141,7 +141,7 @@ public:
 			bd.position.Set(-40.0f + 2.0f * i, 0.5f);
 
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 		}
 
@@ -153,7 +153,7 @@ public:
 			b2BodyDef bd;
 			bd.position = pivot + m_offset;
 			m_chassis = m_world->CreateBody(&bd);
-			m_chassis->CreateShape(&sd);
+			m_chassis->CreateFixture(&sd);
 			m_chassis->SetMassFromShapes();
 		}
 
@@ -165,7 +165,7 @@ public:
 			b2BodyDef bd;
 			bd.position = pivot + m_offset;
 			m_wheel = m_world->CreateBody(&bd);
-			m_wheel->CreateShape(&sd);
+			m_wheel->CreateFixture(&sd);
 			m_wheel->SetMassFromShapes();
 		}
 

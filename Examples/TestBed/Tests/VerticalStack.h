@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -23,6 +23,14 @@ class VerticalStack : public Test
 {
 public:
 
+	enum
+	{
+		e_columnCount = 5,
+		e_rowCount = 16
+		//e_columnCount = 1,
+		//e_rowCount = 1
+	};
+
 	VerticalStack()
 	{
 		{
@@ -32,22 +40,22 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, 0.0f);
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(20.0f, 10.0f), 0.0f);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		float32 xs[5] = {0.0f, -10.0f, -5.0f, 5.0f, 10.0f};
 
-		for (int32 j = 0; j < 5; ++j)
+		for (int32 j = 0; j < e_columnCount; ++j)
 		{
 			b2PolygonDef sd;
 			sd.SetAsBox(0.5f, 0.5f);
 			sd.density = 1.0f;
 			sd.friction = 0.3f;
 
-			for (int i = 0; i < 16; ++i)
+			for (int i = 0; i < e_rowCount; ++i)
 			{
 				b2BodyDef bd;
 
@@ -57,7 +65,7 @@ public:
 				bd.position.Set(xs[j] + x, 0.752f + 1.54f * i);
 				b2Body* body = m_world->CreateBody(&bd);
 
-				body->CreateShape(&sd);
+				body->CreateFixture(&sd);
 				body->SetMassFromShapes();
 			}
 		}
@@ -87,7 +95,7 @@ public:
 				bd.position.Set(-31.0f, 5.0f);
 
 				m_bullet = m_world->CreateBody(&bd);
-				m_bullet->CreateShape(&sd);
+				m_bullet->CreateFixture(&sd);
 				m_bullet->SetMassFromShapes();
 
 				m_bullet->SetLinearVelocity(b2Vec2(400.0f, 0.0f));

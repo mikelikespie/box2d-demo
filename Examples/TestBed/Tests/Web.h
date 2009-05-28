@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -33,7 +33,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -10.0f);
 			ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -46,22 +46,22 @@ public:
 
 			bd.position.Set(-5.0f, 5.0f);
 			m_bodies[0] = m_world->CreateBody(&bd);
-			m_bodies[0]->CreateShape(&sd);
+			m_bodies[0]->CreateFixture(&sd);
 			m_bodies[0]->SetMassFromShapes();
 
 			bd.position.Set(5.0f, 5.0f);
 			m_bodies[1] = m_world->CreateBody(&bd);
-			m_bodies[1]->CreateShape(&sd);
+			m_bodies[1]->CreateFixture(&sd);
 			m_bodies[1]->SetMassFromShapes();
 
 			bd.position.Set(5.0f, 15.0f);
 			m_bodies[2] = m_world->CreateBody(&bd);
-			m_bodies[2]->CreateShape(&sd);
+			m_bodies[2]->CreateFixture(&sd);
 			m_bodies[2]->SetMassFromShapes();
 
 			bd.position.Set(-5.0f, 15.0f);
 			m_bodies[3] = m_world->CreateBody(&bd);
-			m_bodies[3]->CreateShape(&sd);
+			m_bodies[3]->CreateFixture(&sd);
 			m_bodies[3]->SetMassFromShapes();
 
 			b2DistanceJointDef jd;

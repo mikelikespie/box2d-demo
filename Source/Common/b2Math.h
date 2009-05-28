@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -21,18 +21,10 @@
 
 #include "b2Settings.h"
 
-#ifdef TARGET_OS_IPHONE
-#include "math.h"
-#else
-#include <cmath>
-#endif
+#include <math.h>
+#include <float.h>
+#include <stddef.h>
 
-
-
-#include <cfloat>
-#include <cstdlib>
-
-#include <stdio.h>
 
 #ifdef TARGET_FLOAT32_IS_FIXED
 
@@ -487,6 +479,13 @@ struct b2XForm
 		R.SetIdentity();
 	}
 
+	/// Set this based on the position and angle.
+	void Set(const b2Vec2& p, float32 angle)
+	{
+		position = p;
+		R.Set(angle);
+	}
+
 	/// Calculate the angle that the rotation matrix represents.
 	float32 GetAngle() const
 	{
@@ -505,11 +504,7 @@ struct b2Sweep
 {
 	/// Get the interpolated transform at a specific time.
 	/// @param alpha is a factor in [0,1], where 0 indicates t0.
-	void GetXForm2(b2XForm* xf, float32 alpha) const;
-
-	/// Get the interpolated transform at a specific time.
-	/// @param t is a factor in [t0,1]
-	void GetXForm(b2XForm* xf, float32 t) const;
+	void GetTransform(b2XForm* xf, float32 alpha) const;
 
 	/// Advance the sweep forward, yielding a new initial state.
 	/// @param t the new initial time.
@@ -526,7 +521,7 @@ extern const b2Vec2 b2Vec2_zero;
 extern const b2Mat22 b2Mat22_identity;
 extern const b2XForm b2XForm_identity;
 
-/// Peform the dot product on two vectors.
+/// Perform the dot product on two vectors.
 inline float32 b2Dot(const b2Vec2& a, const b2Vec2& b)
 {
 	return a.x * b.x + a.y * b.y;

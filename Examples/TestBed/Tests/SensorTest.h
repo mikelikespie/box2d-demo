@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Erin Catto http://www.gphysics.com
+* Copyright (c) 2008-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -35,7 +35,7 @@ public:
 			{
 				b2PolygonDef sd;
 				sd.SetAsBox(50.0f, 10.0f);
-				ground->CreateShape(&sd);
+				ground->CreateFixture(&sd);
 			}
 
 #if 0
@@ -43,7 +43,7 @@ public:
 				b2PolygonDef sd;
 				sd.SetAsBox(10.0f, 2.0f, b2Vec2(0.0f, 20.0f), 0.0f);
 				sd.isSensor = true;
-				m_sensor = ground->CreateShape(&sd);
+				m_sensor = ground->CreateFixture(&sd);
 			}
 #else
 			{
@@ -51,7 +51,7 @@ public:
 				cd.isSensor = true;
 				cd.radius = 5.0f;
 				cd.localPosition.Set(0.0f, 20.0f);
-				m_sensor = ground->CreateShape(&cd);
+				m_sensor = ground->CreateFixture(&cd);
 			}
 #endif
 		}
@@ -68,7 +68,7 @@ public:
 
 				b2Body* body = m_world->CreateBody(&bd);
 
-				body->CreateShape(&sd);
+				body->CreateFixture(&sd);
 				body->SetMassFromShapes();
 			}
 		}
@@ -89,17 +89,17 @@ public:
 				continue;
 			}
 
-			b2Shape* shape1 = point->shape1;
-			b2Shape* shape2 = point->shape2;
+			b2Fixture* fixture1 = point->fixtureA;
+			b2Fixture* fixture2 = point->fixtureB;
 			b2Body* other;
 
-			if (shape1 == m_sensor)
+			if (fixture1 == m_sensor)
 			{
-				other = shape2->GetBody();
+				other = fixture2->GetBody();
 			}
-			else if (shape2 == m_sensor)
+			else if (fixture2 == m_sensor)
 			{
-				other = shape1->GetBody();
+				other = fixture1->GetBody();
 			}
 			else
 			{
@@ -108,8 +108,8 @@ public:
 
 			b2Body* ground = m_sensor->GetBody();
 
-			b2CircleShape* circle = (b2CircleShape*)m_sensor;
-			b2Vec2 center = ground->GetWorldPoint(circle->GetLocalPosition());
+			b2CircleShape* circle = (b2CircleShape*)m_sensor->GetShape();
+			b2Vec2 center = ground->GetWorldPoint(circle->m_p);
 
 			b2Vec2 d = center - point->position;
 			if (d.LengthSquared() < FLT_EPSILON * FLT_EPSILON)
@@ -128,7 +128,7 @@ public:
 		return new SensorTest;
 	}
 
-	b2Shape* m_sensor;
+	b2Fixture* m_sensor;
 };
 
 #endif

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -18,6 +18,7 @@
 
 #include "b2Island.h"
 #include "b2Body.h"
+#include "b2Fixture.h"
 #include "b2World.h"
 #include "Contacts/b2Contact.h"
 #include "Contacts/b2ContactSolver.h"
@@ -453,11 +454,12 @@ void b2Island::Report(b2ContactConstraint* constraints)
 		b2Contact* c = m_contacts[i];
 		b2ContactConstraint* cc = constraints + i;
 		b2ContactResult cr;
-		cr.shape1 = c->GetShape1();
-		cr.shape2 = c->GetShape2();
-		b2Body* b1 = cr.shape1->GetBody();
+		cr.fixtureA = c->GetFixtureA();
+		cr.fixtureB = c->GetFixtureB();
+		b2Body* bodyA = cr.fixtureA->GetBody();
 		int32 manifoldCount = c->GetManifoldCount();
 		b2Manifold* manifolds = c->GetManifolds();
+
 		for (int32 j = 0; j < manifoldCount; ++j)
 		{
 			b2Manifold* manifold = manifolds + j;
@@ -466,7 +468,7 @@ void b2Island::Report(b2ContactConstraint* constraints)
 			{
 				b2ManifoldPoint* point = manifold->points + k;
 				b2ContactConstraintPoint* ccp = cc->points + k;
-				cr.position = b1->GetWorldPoint(point->localPoint1);
+				cr.position = bodyA->GetWorldPoint(point->localPointA);
 
 				// TOI constraint results are not stored, so get
 				// the result from the constraint.

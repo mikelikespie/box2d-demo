@@ -171,6 +171,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\Source\Collision\b2CollideEdge.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\Source\Collision\b2CollidePoly.cpp"
 				>
 			</File>
@@ -184,6 +188,10 @@
 			</File>
 			<File
 				RelativePath="..\..\Source\Collision\b2Distance.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Source\Collision\b2Distance.h"
 				>
 			</File>
 			<File
@@ -204,6 +212,10 @@
 			</File>
 			<File
 				RelativePath="..\..\Source\Collision\b2TimeOfImpact.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Source\Collision\b2TimeOfImpact.h"
 				>
 			</File>
 			<Filter
@@ -296,6 +308,22 @@
 			</File>
 			<File
 				RelativePath="..\..\Source\Dynamics\b2ContactManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Source\Dynamics\b2EdgeChain.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Source\Dynamics\b2EdgeChain.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Source\Dynamics\b2Fixture.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\Source\Dynamics\b2Fixture.h"
 				>
 			</File>
 			<File

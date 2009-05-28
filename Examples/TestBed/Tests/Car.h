@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Erin Catto http://www.gphysics.com
+* Copyright (c) 2008-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -57,8 +57,8 @@ public:
 			bd.position.Set(-35.0f, 2.8f);
 
 			m_vehicle = m_world->CreateBody(&bd);
-			m_vehicle->CreateShape(&poly1);
-			m_vehicle->CreateShape(&poly2);
+			m_vehicle->CreateFixture(&poly1);
+			m_vehicle->CreateFixture(&poly2);
 			m_vehicle->SetMassFromShapes();
 		}
 
@@ -74,12 +74,12 @@ public:
 			bd.position.Set(-33.8f, 2.0f);
 
 			m_rightWheel = m_world->CreateBody(&bd);
-			m_rightWheel->CreateShape(&circ);
+			m_rightWheel->CreateFixture(&circ);
 			m_rightWheel->SetMassFromShapes();
 
 			bd.position.Set(-36.2f, 2.0f);
 			m_leftWheel = m_world->CreateBody(&bd);
-			m_leftWheel->CreateShape(&circ);
+			m_leftWheel->CreateFixture(&circ);
 			m_leftWheel->SetMassFromShapes();
 		}
 
@@ -107,7 +107,7 @@ public:
 			bd.position.Set(-25.0f, 1.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&box);
+			ground->CreateFixture(&box);
 		}
 
 		{	// more ground
@@ -119,7 +119,7 @@ public:
 			bd.position.Set(27.0f - 30.0f, 3.1f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&box);
+			ground->CreateFixture(&box);
 		}
 
 		{	// more ground
@@ -131,7 +131,7 @@ public:
 			bd.position.Set(55.0f - 30.0f, 3.1f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&box);
+			ground->CreateFixture(&box);
 		}
 
 		{	// more ground
@@ -143,7 +143,7 @@ public:
 			bd.position.Set(41.0f, 2.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&box);
+			ground->CreateFixture(&box);
 		}
 
 		{	// more ground
@@ -155,7 +155,7 @@ public:
 			bd.position.Set(50.0f, 4.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&box);
+			ground->CreateFixture(&box);
 		}
 
 		{	// more ground
@@ -167,7 +167,7 @@ public:
 			bd.position.Set(85.0f, 2.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&box);
+			ground->CreateFixture(&box);
 		}
 	}
 

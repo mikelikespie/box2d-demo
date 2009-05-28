@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -38,7 +38,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-1.0f, -7.5f);
 			m_ground = m_world->CreateBody(&bd);
-			m_ground->CreateShape(&sd);
+			m_ground->CreateFixture(&sd);
 		}
 		/// Upper static body
 		{
@@ -49,12 +49,12 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-20.f, 93.0f);
 			b2Body* g = m_world->CreateBody(&bd);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
 			sd.SetAsBox(15.f, 0.50f,b2Vec2(-15.0f,12.5f),0.0f);
-            g->CreateShape(&sd);
+            g->CreateFixture(&sd);
 
             sd.SetAsBox(20.f,0.5f,b2Vec2(0.0f,-25.0f),-0.5f);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
         }
 		/// Left channel left wall
 		{
@@ -65,7 +65,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-49.3f, 50.0f);
 			b2Body* g = m_world->CreateBody(&bd);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
         }
 		/// Right wall
 		{
@@ -76,7 +76,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(45.f, 50.0f);
 			b2Body* g = m_world->CreateBody(&bd);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
         }
 		/// Left channel right upper wall  
 		{
@@ -88,7 +88,7 @@ public:
 			bd.position.Set(-42.0f, 70.0f);
 		    bd.angle = -0.03f*b2_pi;
 			b2Body* g = m_world->CreateBody(&bd);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
 		}
 		/// Left channel right lower wall
 		{
@@ -99,7 +99,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-44.0f, 27.0f);
 			b2Body* g = m_world->CreateBody(&bd);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
         /// Bottom motors
 		    b2CircleDef cd;
 			cd.radius   = 3.0f;
@@ -109,7 +109,7 @@ public:
         /// 1. 
 			bd.position.Set(-40.0f,2.5f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             body->SetMassFromShapes(); 
             b2RevoluteJointDef jr;
 			jr.Initialize (g,body,body->GetWorldCenter()+b2Vec2(0.f,1.f));
@@ -121,9 +121,9 @@ public:
 			bd.position.Set(-46.0f,-2.5f);
             cd. radius = 1.5f;  jr.motorSpeed  = -20.f;
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             sd.SetAsBox(2.0f, 0.50f);
-            body->CreateShape(&sd);
+            body->CreateFixture(&sd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter());
 			m_world->CreateJoint(&jr);
@@ -131,7 +131,7 @@ public:
             cd.radius   = 3.0f; jr.motorSpeed  = 20.f;
 			bd.position.Set(-32.0f,2.5f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter()+b2Vec2(0.f,1.f));
 			m_world->CreateJoint(&jr);
@@ -139,37 +139,37 @@ public:
             jr.motorSpeed     = 20.f;
 			bd.position.Set(-24.0f,1.5f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter()+b2Vec2(0.f,1.f));
 			m_world->CreateJoint(&jr);
         /// 4.
 			bd.position.Set(-16.0f,0.8f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter()+b2Vec2(0.f,1.f));
 			m_world->CreateJoint(&jr);
         /// 5.
 			bd.position.Set(-8.0f,0.5f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter()+b2Vec2(0.f,1.f));
 			m_world->CreateJoint(&jr);
         /// 6.
 			bd.position.Set(0.0f,0.1f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter()+b2Vec2(0.f,1.f));
 			m_world->CreateJoint(&jr);
         /// 7.
 			bd.position.Set(8.0f,-0.5f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
 			sd.SetAsBox(3.7f, 0.5f);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter()+b2Vec2(0.f,1.f));
 			m_world->CreateJoint(&jr);
@@ -178,13 +178,13 @@ public:
             sd.density = 2.0f;
 			bd.position.Set(18.0f,1.f);
 			b2Body* rightmotor = m_world->CreateBody(&bd);
-			rightmotor->CreateShape(&sd);
+			rightmotor->CreateFixture(&sd);
 			sd.SetAsBox(4.5f, 0.5f, b2Vec2(0.f,0.f),b2_pi/3.f);
-			rightmotor->CreateShape(&sd);
+			rightmotor->CreateFixture(&sd);
 			sd.SetAsBox(4.5f, 0.5f, b2Vec2(0.f,0.f),b2_pi*2.f/3.f);
-			rightmotor->CreateShape(&sd);
+			rightmotor->CreateFixture(&sd);
 			cd.radius = 4.2f;
-			rightmotor->CreateShape(&cd);
+			rightmotor->CreateFixture(&cd);
             rightmotor->SetMassFromShapes(); 
 			jr.Initialize (g,rightmotor,rightmotor->GetWorldCenter());
             jr.maxMotorTorque = 70000.f;
@@ -195,12 +195,12 @@ public:
             sd.density = 2.0f;
 			bd.position.Set(-34.0f,17.f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			sd.SetAsBox(8.5f, 0.5f, b2Vec2(0.f,0.f),b2_pi*.5f);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			cd.radius = 7.f;
 			cd.friction = 0.9f;
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
             body->SetMassFromShapes(); 
 			jr.Initialize (g,body,body->GetWorldCenter());
             jr.maxMotorTorque = 100000.f;
@@ -211,7 +211,7 @@ public:
             sd.density = 10.0f;
 			bd.position.Set(-16.0f,17.f);
 			b2Body *hammerleft = m_world->CreateBody(&bd);
-			hammerleft->CreateShape(&sd);
+			hammerleft->CreateFixture(&sd);
 			hammerleft->SetMassFromShapes();
 			b2DistanceJointDef jd;
 			jd.Initialize(body, hammerleft, body->GetWorldCenter()+b2Vec2(0.f,6.f), hammerleft->GetWorldCenter() );
@@ -219,7 +219,7 @@ public:
 
 			bd.position.Set(4.0f,17.f);
 			b2Body *hammerright = m_world->CreateBody(&bd);
-			hammerright->CreateShape(&sd);
+			hammerright->CreateFixture(&sd);
 			hammerright->SetMassFromShapes();
 			jd.Initialize(body, hammerright, body->GetWorldCenter()-b2Vec2(0.f,6.f), hammerright->GetWorldCenter() );
 			m_world->CreateJoint(&jd);
@@ -227,10 +227,10 @@ public:
             sd.SetAsBox(6.f,0.75f);
 			bd.position.Set(-21.0f,9.f);
 			b2Body* pusher = m_world->CreateBody(&bd);
-			pusher->CreateShape(&sd);
+			pusher->CreateFixture(&sd);
 			sd.SetAsBox(2.f,1.5f,b2Vec2(-5.f,0.f),0.f);
 			pusher->SetMassFromShapes();
-			pusher->CreateShape(&sd);
+			pusher->CreateFixture(&sd);
 			jd.Initialize(rightmotor,pusher,rightmotor->GetWorldCenter()+b2Vec2(-8.0f,0.f),
 				          pusher->GetWorldCenter()+b2Vec2(5.0f,0.f) );
 			m_world->CreateJoint(&jd);
@@ -246,29 +246,29 @@ public:
 			bd.position.Set(-15.5f, 12.f);
             bd.angle = 0.0;
 			b2Body* g = m_world->CreateBody(&bd);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
 		    
 			sd.SetAsBox(8.f, 0.5f, b2Vec2(23.f,0.f),0.f);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
             /// compressor statics  
 			sd.SetAsBox(7.0f, 0.5f, b2Vec2(-2.f,9.f),0.f);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
 			sd.SetAsBox(9.0f, 0.5f, b2Vec2(22.f,9.f),0.f);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
 
 			sd.SetAsBox(19.0f, 0.5f, b2Vec2(-9.f,15.f),-0.05f);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
 			sd.SetAsBox(4.7f, 0.5f, b2Vec2(15.f,11.5f),-0.5f);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
             /// below compressor
 			sd.SetAsBox(26.0f, 0.3f, b2Vec2(17.f,-4.4f),-0.02f);
-			g->CreateShape(&sd);
+			g->CreateFixture(&sd);
 			cd.radius   = 1.0f;	cd.friction = 1.0;
 			cd.localPosition = b2Vec2(29.f,-6.f);
-            g->CreateShape(&cd); 
+            g->CreateFixture(&cd); 
             cd.radius   = 0.7f;
 			cd.localPosition = b2Vec2(-2.f,-4.5f);
-            g->CreateShape(&cd);
+            g->CreateFixture(&cd);
         }
         /// Elevator
         {
@@ -282,11 +282,11 @@ public:
 			sd.SetAsBox(0.5f, 2.5f,b2Vec2(3.0f,-3.0f), 0.f);
 			sd.density     = 1.f;
 			sd.friction    = 0.01f;
-			m_elev->CreateShape(&sd);
+			m_elev->CreateFixture(&sd);
 			sd.SetAsBox(7.0f, 0.5f, b2Vec2(-3.5f,-5.5f), 0.f);
-			m_elev->CreateShape(&sd);
+			m_elev->CreateFixture(&sd);
 			sd.SetAsBox(0.5f, 2.5f, b2Vec2(-11.f,-3.5f), 0.f);
-			m_elev->CreateShape(&sd);
+			m_elev->CreateFixture(&sd);
             m_elev->SetMassFromShapes();           
 		    
 			b2PrismaticJointDef jp;
@@ -304,20 +304,20 @@ public:
             sd.density = 0.5f;
             bd.position.Set(29.0f,6.5f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
             sd.SetAsBox(2.5f, 0.5f,b2Vec2(3.0f,-2.f), b2_pi/2.f);
-            body->CreateShape(&sd);
+            body->CreateFixture(&sd);
             sd.SetAsBox(4.6f, 0.5f,b2Vec2(7.8f,-4.0f), 0.f);
-            body->CreateShape(&sd);
+            body->CreateFixture(&sd);
             sd.SetAsBox(0.5f, 4.5f,b2Vec2(12.f,0.0f), 0.f);
-            body->CreateShape(&sd);
+            body->CreateFixture(&sd);
             
 			sd.SetAsBox(0.5f, 0.5f,b2Vec2(13.f,4.0f), 0.f);
-            body->CreateShape(&sd);
+            body->CreateFixture(&sd);
 
             cd.radius   = 0.7f; cd.density  = 1.f; cd.friction = 0.01f;
             cd.localPosition = b2Vec2(0.f,0.f);
-            body->CreateShape(&cd);
+            body->CreateFixture(&cd);
             body->SetMassFromShapes();  
 
             b2RevoluteJointDef jr;
@@ -331,7 +331,7 @@ public:
             sd.SetAsBox(14.0f, 0.5f,b2Vec2(-3.5f,-10.0f), 0.0f);
             bd.position.Set(17.5f,96.0f);
             body = m_world->CreateBody(&bd);
-            body->CreateShape(&sd);
+            body->CreateFixture(&sd);
 		}
 		/// "Elastic body" 64 bodies - something like a lin. elastic compound
 		/// connected via dynamic forces (springs) 
@@ -353,7 +353,7 @@ public:
 					bd.position  += startpoint;
 					b2Body* body  = m_world->CreateBody(&bd);
 					bodies[8*i+j] = body;
-					body->CreateShape(&sd);
+					body->CreateFixture(&sd);
 					body->SetMassFromShapes();
 				}
 			}

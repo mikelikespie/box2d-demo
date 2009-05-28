@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -52,9 +52,9 @@ public:
          ground = m_world->CreateBody(&bd);
          /// bottom
          sd.SetAsBox( H(gx), H(gy) );
-         ground->CreateShape(&sd);
+         ground->CreateFixture(&sd);
          sd.SetAsBox( H(dx), H(gy), b2Vec2(-dx,sy-1.0f), 0.0f );
-         ground->CreateShape(&sd);
+         ground->CreateFixture(&sd);
         }  
         /// dyn bodies 
         { 
@@ -117,7 +117,7 @@ public:
          for (int32 i=0; i<60; i++ )
          {
            b = m_world->CreateBody(&bd);
-           b->CreateShape (&cd);
+           b->CreateFixture (&cd);
            b->SetMassFromShapes();
          }
          
@@ -160,7 +160,7 @@ public:
             pd.vertices[2].Set(triangles[i].v[2]->x, triangles[i].v[2]->y);
             bd.position.Set(pos.x,pos.y);
             b = m_world->CreateBody(&bd);
-            b->CreateShape(&pd);
+            b->CreateFixture(&pd);
             b->SetMassFromShapes();
             /// we need the body pointer in the triangles for the joints later
             triangles[i].userData = (void *)b;

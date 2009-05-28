@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -38,16 +38,16 @@ public:
 			sd.restitution = k_restitution;
 
 			sd.SetAsBox(0.2f, 20.0f, b2Vec2(-20.0f, 0.0f), 0.0f);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 
 			sd.SetAsBox(0.2f, 20.0f, b2Vec2(20.0f, 0.0f), 0.0f);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 
 			sd.SetAsBox(0.2f, 20.0f, b2Vec2(0.0f, -20.0f), 0.5f * b2_pi);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 
 			sd.SetAsBox(0.2f, 20.0f, b2Vec2(0.0f, 20.0f), -0.5f * b2_pi);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -80,8 +80,8 @@ public:
 			bd.position.Set(0.0f, 1.05f);
 			bd.angle = b2_pi;
 			m_body = m_world->CreateBody(&bd);
-			m_body->CreateShape(&sd1);
-			m_body->CreateShape(&sd2);
+			m_body->CreateFixture(&sd1);
+			m_body->CreateFixture(&sd2);
 			m_body->SetMassFromShapes();
 		}
 	}

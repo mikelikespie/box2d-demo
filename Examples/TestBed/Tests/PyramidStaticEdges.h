@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -33,18 +33,18 @@ public:
 			
 			b2Vec2 verts[2];
 			
-			for (int32 i = 0; i < 2; i++) {
+			for (int32 i = 0; i < 2; i++)
+			{
 				verts[i].Set(coords[i*2], coords[i*2 + 1]);
 			}
 			
 			b2BodyDef bd;
 			bd.position.Set( 0.0f, 0.0f );
 			b2Body* body = m_world->CreateBody(&bd);
-			b2EdgeChainDef edgeDef;
-			edgeDef.vertexCount = 2;
-			edgeDef.vertices = verts;
-			edgeDef.isALoop = false;
-			body->CreateShape(&edgeDef);
+			b2EdgeDef edgeDef;
+			edgeDef.vertex1 = verts[0];
+			edgeDef.vertex2 = verts[1];
+			body->CreateFixture(&edgeDef);
 			
 			//body->SetMassFromShapes();
 		}
@@ -71,7 +71,7 @@ public:
 					b2BodyDef bd;
 					bd.position = y;
 					b2Body* body = m_world->CreateBody(&bd);
-					body->CreateShape(&sd);
+					body->CreateFixture(&sd);
 					body->SetMassFromShapes();
 
 					y += deltaY;

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -34,10 +34,10 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -0.2f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 
 			//sd.SetAsBox(0.2f, 1.0f, b2Vec2(0.5f, 1.2f), 0.0f);
-			//body->CreateShape(&sd);
+			//body->CreateFixture(&sd);
 		}
 
 		{
@@ -52,7 +52,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(00.0f, 20.0f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 			body->SetLinearVelocity(b2Vec2(0.0f, -100.0f));
 			body->SetAngularVelocity(m_angularVelocity);
@@ -67,7 +67,7 @@ public:
 			bd.type = b2BodyDef::e_static;
 			bd.position.Set(0.0f, -0.2f);
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -82,7 +82,7 @@ public:
 			bd1.allowSleep = false;
 			bd1.position.Set(0.0f, 20.0f);
 			b2Body* b1 = m_world->Create(&bd1);
-			b1->CreateShape(&sd);
+			b1->CreateFixture(&sd);
 			b1->SetMassFromShapes();
 			b1->SetLinearVelocity(b2Vec2(0.0f, -100.0f));
 
@@ -93,7 +93,7 @@ public:
 			bd2.allowSleep = false;
 			bd2.position.Set(0.0f, 20.2f);
 			b2Body* b2 = m_world->Create(&bd2);
-			b2->CreateShape(&sd);
+			b2->CreateFixture(&sd);
 			b2->SetMassFromShapes();
 			b2->SetLinearVelocity(b2Vec2(0.0f, -100.0f));
 
@@ -105,7 +105,7 @@ public:
 			bd3.allowSleep = false;
 			bd3.position.Set(0.0f, 100.0f);
 			b2Body* b3 = m_world->Create(&bd3);
-			b3->CreateShape(&sd);
+			b3->CreateFixture(&sd);
 			b3->SetMassFromShapes();
 			b3->SetLinearVelocity(b2Vec2(0.0f, -150.0f));
 		}
@@ -122,16 +122,16 @@ public:
 			sd.restitution = k_restitution;
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(0.0f, -10.0f), 0.5f * b2_pi);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(0.0f, 10.0f), -0.5f * b2_pi);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 		}
 
 #if 0
@@ -156,10 +156,10 @@ public:
 			bd.type = b2BodyDef::e_dynamicBody;
 			bd.position.Set(0.0f, 15.0f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd_bottom);
-			body->CreateShape(&sd_top);
-			body->CreateShape(&sd_left);
-			body->CreateShape(&sd_right);
+			body->CreateFixture(&sd_bottom);
+			body->CreateFixture(&sd_top);
+			body->CreateFixture(&sd_left);
+			body->CreateFixture(&sd_right);
 			body->SetMassFromShapes();
 		}
 #elif 0
@@ -179,9 +179,9 @@ public:
 			b2BodyDef bd;
 			bd.position.Set( 0.0f, 15.0f );
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd_bottom);
-			body->CreateShape(&sd_left);
-			body->CreateShape(&sd_right);
+			body->CreateFixture(&sd_bottom);
+			body->CreateFixture(&sd_left);
+			body->CreateFixture(&sd_right);
 			body->SetMassFromShapes();
 		}
 #else
@@ -196,7 +196,7 @@ public:
 			sd.SetAsBox(0.1f, 4.0f);
 			sd.density = 1.0f;
 			sd.restitution = 0.0f;
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 		}
 #endif
@@ -213,7 +213,7 @@ public:
 			sd.radius = 0.25f;
 			sd.density = 1.0f;
 			sd.restitution = 0.0f;
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 		}
 #endif

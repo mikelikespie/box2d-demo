@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -34,7 +34,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -10.0f);
 			ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -50,7 +50,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, 7.0f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 
 			rjd.Initialize(prevBody, body, b2Vec2(0.0f, 5.0f));
@@ -65,7 +65,7 @@ public:
 			sd.SetAsBox(0.5f, 4.0f);
 			bd.position.Set(0.0f, 13.0f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 
 			rjd.Initialize(prevBody, body, b2Vec2(0.0f, 9.0f));
@@ -78,7 +78,7 @@ public:
 			sd.SetAsBox(1.5f, 1.5f);
 			bd.position.Set(0.0f, 17.0f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 
 			rjd.Initialize(prevBody, body, b2Vec2(0.0f, 17.0f));
@@ -96,7 +96,7 @@ public:
 			sd.density = 2.0f;
 			bd.position.Set(0.0f, 23.0f);
 			body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 		}
 	}

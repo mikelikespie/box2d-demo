@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -44,7 +44,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -10.0f);
 			ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -63,7 +63,7 @@ public:
 				b2BodyDef bd;
 				bd.position.Set(-14.5f + 1.0f * i, 5.0f);
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd);
+				body->CreateFixture(&sd);
 				body->SetMassFromShapes();
 
 				b2Vec2 anchor(-15.0f + 1.0f * i, 5.0f);
@@ -92,7 +92,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-8.0f + 8.0f * i, 12.0f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 
 			bc->AddBody(body);
@@ -107,7 +107,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-6.0f + 6.0f * i, 10.0f);
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 
 			bc->AddBody(body);
@@ -238,12 +238,12 @@ public:
 			weight.density = 100.0f;
 			weight.radius = 0.5f;
 			weight.localPosition.Set(8.9f, 5.75f);
-			body->CreateShape(&weight);
+			body->CreateFixture(&weight);
 			
 			b2EdgeChainDef edgeDef;
 			edgeDef.vertexCount = 6;
 			edgeDef.vertices = b2Loop2;
-			body->CreateShape(&edgeDef);
+			body->CreateFixture(&edgeDef);
 			
 			body->SetMassFromShapes();
 
@@ -256,11 +256,11 @@ public:
 			body = m_world->CreateBody(&bd);
 			weight.radius = 1.0f;
 			weight.localPosition.Set(20.5f, 7.0f);
-			body->CreateShape(&weight);
+			body->CreateFixture(&weight);
 			
 			edgeDef.vertexCount = 87;
 			edgeDef.vertices = b2Loop1;
-			body->CreateShape(&edgeDef);
+			body->CreateFixture(&edgeDef);
 			
 			body->SetMassFromShapes();
 

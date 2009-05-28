@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2008 Erin Catto http://www.gphysics.com
+* Copyright (c) 2008-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -33,7 +33,7 @@ public:
 			bd.position.Set(0.0f, -10.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		b2BodyDef bodydef;
@@ -43,10 +43,10 @@ public:
 		b2PolygonDef sd;
 		sd.SetAsBox(4.0f, 4.0f, b2Vec2(0.0f, 0.0f), 0.0f);
 		sd.density = 10.0f;
-		m_shape1 = m_body->CreateShape(&sd);
+		m_fixture1 = m_body->CreateFixture(&sd);
 		m_body->SetMassFromShapes();
 
-		m_shape2 = NULL;
+		m_fixture2 = NULL;
 	}
 
 	void Keyboard(unsigned char key)
@@ -54,23 +54,23 @@ public:
 		switch (key)
 		{
 		case 'c':
-			if (m_shape2 == NULL)
+			if (m_fixture2 == NULL)
 			{
 				b2CircleDef sd;
 				sd.radius = 3.0f;
 				sd.density = 10.0f;
 				sd.localPosition.Set(0.5f, -4.0f);
-				m_shape2 = m_body->CreateShape(&sd);
+				m_fixture2 = m_body->CreateFixture(&sd);
 				m_body->SetMassFromShapes();
 				m_body->WakeUp();
 			}
 			break;
 
 		case 'd':
-			if (m_shape2 != NULL)
+			if (m_fixture2 != NULL)
 			{
-				m_body->DestroyShape(m_shape2);
-				m_shape2 = NULL;
+				m_body->DestroyFixture(m_fixture2);
+				m_fixture2 = NULL;
 				m_body->SetMassFromShapes();
 				m_body->WakeUp();
 			}
@@ -92,8 +92,8 @@ public:
 	}
 
 	b2Body* m_body;
-	b2Shape* m_shape1;
-	b2Shape* m_shape2;
+	b2Fixture* m_fixture1;
+	b2Fixture* m_fixture2;
 };
 
 #endif

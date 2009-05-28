@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ public:
 
 			b2PolygonDef sd;
 			sd.SetAsBox(50.0f, 10.0f);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 		}
 
 		{
@@ -53,8 +53,8 @@ public:
 				bd.position.Set(x + 5.0f, 1.05f + 2.5f * i);
 				bd.angle = RandomFloat(-b2_pi, b2_pi);
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd1);
-				body->CreateShape(&sd2);
+				body->CreateFixture(&sd1);
+				body->CreateFixture(&sd2);
 				body->SetMassFromShapes();
 			}
 		}
@@ -75,8 +75,8 @@ public:
 				bd.position.Set(x - 5.0f, 1.05f + 2.5f * i);
 				bd.angle = RandomFloat(-b2_pi, b2_pi);
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd1);
-				body->CreateShape(&sd2);
+				body->CreateFixture(&sd1);
+				body->CreateFixture(&sd2);
 				body->SetMassFromShapes();
 			}
 		}
@@ -111,8 +111,8 @@ public:
 				bd.position.Set(x, 2.05f + 2.5f * i);
 				bd.angle = 0.0f;
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd1);
-				body->CreateShape(&sd2);
+				body->CreateFixture(&sd1);
+				body->CreateFixture(&sd2);
 				body->SetMassFromShapes();
 			}
 		}
@@ -133,9 +133,9 @@ public:
 			b2BodyDef bd;
 			bd.position.Set( 0.0f, 2.0f );
 			b2Body* body = m_world->CreateBody(&bd);
-			body->CreateShape(&sd_bottom);
-			body->CreateShape(&sd_left);
-			body->CreateShape(&sd_right);
+			body->CreateFixture(&sd_bottom);
+			body->CreateFixture(&sd_left);
+			body->CreateFixture(&sd_right);
 			body->SetMassFromShapes();
 		}
 	}

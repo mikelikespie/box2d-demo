@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -84,13 +84,14 @@ const float32 b2_pi = 3.14159265359f;
 /// The initial pool size for the dynamic tree.
 #define b2_nodePoolSize				50
 
-/// this must be a power of two
+/// This must be a power of two
 #define b2_maxProxies				512
 
-// this must be a power of two
+/// This must be a power of two
 #define b2_maxPairs					(8 * b2_maxProxies)
 
-
+/// The radius of the polygon/edge shape skin.
+#define b2_polygonRadius			0.01f
 
 // Dynamics
 
@@ -101,11 +102,6 @@ const float32 b2_linearSlop = 0.005f;	// 0.5 cm
 /// A small angle used as a collision and constraint tolerance. Usually it is
 /// chosen to be numerically significant, but visually insignificant.
 const float32 b2_angularSlop = 2.0f / 180.0f * b2_pi;			// 2 degrees
-
-/// Continuous collision detection (CCD) works with core, shrunken shapes. This is the
-/// amount by which shapes are automatically shrunk to work with CCD. This must be
-/// larger than b2_linearSlop.
-const float32 b2_toiSlop = 8.0f * b2_linearSlop;
 
 /// Maximum number of contacts to be handled to solve a TOI island.
 const int32 b2_maxTOIContactsPerIsland = 32;

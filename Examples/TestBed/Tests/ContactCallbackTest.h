@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -29,9 +29,9 @@
 
 bool key_comp( const ContactPoint& lhs, const ContactPoint& rhs )
 {
-	if( lhs.shape1 < rhs.shape1 ) return true;
-	if( lhs.shape1 == rhs.shape1 && lhs.shape2 < rhs.shape2 ) return true;
-	if( lhs.shape1 == rhs.shape1 && lhs.shape2 == rhs.shape2 && lhs.id.key < rhs.id.key ) return true;
+	if( lhs.fixtureA < rhs.fixtureA ) return true;
+	if( lhs.fixtureA == rhs.fixtureA && lhs.fixtureB < rhs.fixtureB ) return true;
+	if( lhs.fixtureA == rhs.fixtureA && lhs.fixtureB == rhs.fixtureB && lhs.id.key < rhs.id.key ) return true;
 	return false;
 }
 
@@ -49,93 +49,93 @@ public:
 		sd.vertices[0].Set(10,10);
 		sd.vertices[1].Set(9,7);
 		sd.vertices[2].Set(10,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(9,7);
 		sd.vertices[1].Set(8,0);
 		sd.vertices[2].Set(10,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(9,7);
 		sd.vertices[1].Set(8,5);
 		sd.vertices[2].Set(8,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(8,5);
 		sd.vertices[1].Set(7,4);
 		sd.vertices[2].Set(8,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(7,4);
 		sd.vertices[1].Set(5,0);
 		sd.vertices[2].Set(8,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(7,4);
 		sd.vertices[1].Set(5,3);
 		sd.vertices[2].Set(5,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(5,3);
 		sd.vertices[1].Set(2,2);
 		sd.vertices[2].Set(5,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(2,2);
 		sd.vertices[1].Set(0,0);
 		sd.vertices[2].Set(5,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[0].Set(2,2);
 		sd.vertices[1].Set(-2,2);
 		sd.vertices[2].Set(0,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-2,2);
 		sd.vertices[1].Set(0,0);
 		sd.vertices[0].Set(-5,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-5,3);
 		sd.vertices[1].Set(-2,2);
 		sd.vertices[0].Set(-5,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-7,4);
 		sd.vertices[1].Set(-5,3);
 		sd.vertices[0].Set(-5,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-7,4);
 		sd.vertices[1].Set(-5,0);
 		sd.vertices[0].Set(-8,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-8,5);
 		sd.vertices[1].Set(-7,4);
 		sd.vertices[0].Set(-8,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-9,7);
 		sd.vertices[1].Set(-8,5);
 		sd.vertices[0].Set(-8,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-9,7);
 		sd.vertices[1].Set(-8,0);
 		sd.vertices[0].Set(-10,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.vertices[2].Set(-10,10);
 		sd.vertices[1].Set(-9,7);
 		sd.vertices[0].Set(-10,0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.SetAsBox(.5,6,b2Vec2(10.5,6),0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		sd.SetAsBox(.5,6,b2Vec2(-10.5,6),0);
-		m_world->GetGroundBody()->CreateShape(&sd);
+		m_world->GetGroundBody()->CreateFixture(&sd);
 
 		b2BodyDef bd;
 		bd.position.Set(9.5,60);
@@ -144,7 +144,7 @@ public:
 #if 1
 		b2PolygonDef cd;
 		cd.vertexCount = 8;
-		float32 w = 1.0f;
+		float32 w = 0.95f;
 		float32 b = w / (2.0f + sqrtf(2.0f));
 		float32 s = sqrtf(2.0f) * b;
 		cd.vertices[0].Set(0.5f * s, 0.0f);
@@ -163,7 +163,7 @@ public:
 		cd.density = 1;
 #endif
 
-		m_ball_shape = m_ball->CreateShape(&cd);
+		m_ball_shape = m_ball->CreateFixture(&cd);
 		m_ball->SetMassFromShapes();
 	}
 
@@ -196,7 +196,7 @@ public:
 					{
 						oss << "      ";
 					}
-					oss << "added:   " << m_points[i].shape1 << " -> " << m_points[i].shape2;
+					oss << "added:   " << m_points[i].fixtureA << " -> " << m_points[i].fixtureB;
 					oss << " : " << m_points[i].id.key;
 					m_strings.push_back( oss.str() );
 					std::cout << oss.str() << std::endl;
@@ -212,7 +212,7 @@ public:
 					{
 						oss << "      ";
 					}
-					oss << "removed: " << m_points[i].shape1 << " -> " << m_points[i].shape2;
+					oss << "removed: " << m_points[i].fixtureA << " -> " << m_points[i].fixtureB;
 					oss << " : " << m_points[i].id.key;
 					m_strings.push_back( oss.str() );
 					std::cout << oss.str() << std::endl;
@@ -223,8 +223,8 @@ public:
 				{
 					if( m_set.find( m_points[i] ) == m_set.end() )
 					{
-						oss << "ERROR persist: " << m_points[i].shape1 << " -> ";
-						oss << m_points[i].shape2 << " : " << m_points[i].id.key;
+						oss << "ERROR persist: " << m_points[i].fixtureA << " -> ";
+						oss << m_points[i].fixtureB << " : " << m_points[i].id.key;
 						m_strings.push_back( oss.str() );
 						std::cout << oss.str() << std::endl;
 					}
@@ -251,7 +251,7 @@ public:
 
 	b2Body* m_ball;
 	b2Body* m_bullet;
-	b2Shape* m_ball_shape;
+	b2Fixture* m_ball_shape;
 	std::set<ContactPoint,bool(*)(const ContactPoint&,const ContactPoint&)> m_set;
 	std::deque<std::string> m_strings;
 

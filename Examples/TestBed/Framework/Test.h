@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -68,7 +68,7 @@ struct Settings
 		drawFrictionForces(0),
 		drawCOMs(0),
 		enableWarmStarting(1),
-		enableTOI(1),
+		enableContinuous(1),
 		pause(0),
 		singleStep(0)
 		{}
@@ -90,7 +90,7 @@ struct Settings
 	int32 drawCOMs;
 	int32 drawStats;
 	int32 enableWarmStarting;
-	int32 enableTOI;
+	int32 enableContinuous;
 	int32 pause;
 	int32 singleStep;
 };
@@ -108,7 +108,7 @@ extern TestEntry g_testEntries[];
 class DestructionListener : public b2DestructionListener
 {
 public:
-	void SayGoodbye(b2Shape* shape) { B2_NOT_USED(shape); }
+	void SayGoodbye(b2Fixture* fixture) { B2_NOT_USED(fixture); }
 	void SayGoodbye(b2Joint* joint);
 
 	Test* test;
@@ -143,8 +143,8 @@ enum ContactState
 
 struct ContactPoint
 {
-	b2Shape* shape1;
-	b2Shape* shape2;
+	b2Fixture* fixtureA;
+	b2Fixture* fixtureB;
 	b2Vec2 normal;
 	b2Vec2 position;
 	b2Vec2 velocity;

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2007-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -10.0f);
 			ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -49,12 +49,12 @@ public:
 
 			bd.position.Set(-10.0f, y);
 			b2Body* body1 = m_world->CreateBody(&bd);
-			body1->CreateShape(&sd);
+			body1->CreateFixture(&sd);
 			body1->SetMassFromShapes();
 
 			bd.position.Set(10.0f, y);
 			b2Body* body2 = m_world->CreateBody(&bd);
-			body2->CreateShape(&sd);
+			body2->CreateFixture(&sd);
 			body2->SetMassFromShapes();
 
 			b2PulleyJointDef pulleyDef;

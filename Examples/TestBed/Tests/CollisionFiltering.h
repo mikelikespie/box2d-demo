@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -52,7 +52,7 @@ public:
 			bd.position.Set(0.0f, -10.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		// Small triangle
@@ -71,7 +71,7 @@ public:
 		triangleBodyDef.position.Set(-5.0f, 2.0f);
 
 		b2Body* body1 = m_world->CreateBody(&triangleBodyDef);
-		body1->CreateShape(&triangleShapeDef);
+		body1->CreateFixture(&triangleShapeDef);
 		body1->SetMassFromShapes();
 
 		// Large triangle (recycle definitions)
@@ -83,7 +83,7 @@ public:
 		triangleBodyDef.fixedRotation = true; // look at me!
 
 		b2Body* body2 = m_world->CreateBody(&triangleBodyDef);
-		body2->CreateShape(&triangleShapeDef);
+		body2->CreateFixture(&triangleShapeDef);
 		body2->SetMassFromShapes();
 
 		// Small box
@@ -99,7 +99,7 @@ public:
 		boxBodyDef.position.Set(0.0f, 2.0f);
 
 		b2Body* body3 = m_world->CreateBody(&boxBodyDef);
-		body3->CreateShape(&boxShapeDef);
+		body3->CreateFixture(&boxShapeDef);
 		body3->SetMassFromShapes();
 
 		// Large box (recycle definitions)
@@ -108,7 +108,7 @@ public:
 		boxBodyDef.position.Set(0.0f, 6.0f);
 
 		b2Body* body4 = m_world->CreateBody(&boxBodyDef);
-		body4->CreateShape(&boxShapeDef);
+		body4->CreateFixture(&boxShapeDef);
 		body4->SetMassFromShapes();
 
 		// Small circle
@@ -124,7 +124,7 @@ public:
 		circleBodyDef.position.Set(5.0f, 2.0f);
 		
 		b2Body* body5 = m_world->CreateBody(&circleBodyDef);
-		body5->CreateShape(&circleShapeDef);
+		body5->CreateFixture(&circleShapeDef);
 		body5->SetMassFromShapes();
 
 		// Large circle
@@ -133,7 +133,7 @@ public:
 		circleBodyDef.position.Set(5.0f, 6.0f);
 
 		b2Body* body6 = m_world->CreateBody(&circleBodyDef);
-		body6->CreateShape(&circleShapeDef);
+		body6->CreateFixture(&circleShapeDef);
 		body6->SetMassFromShapes();
 	}
 	static Test* Create()

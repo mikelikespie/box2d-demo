@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -23,14 +23,14 @@
 
 struct b2Vec2;
 struct b2XForm;
-class b2Shape;
+class b2Fixture;
 class b2Body;
 class b2Joint;
 class b2Contact;
 struct b2ContactPoint;
 struct b2ContactResult;
 
-/// Joints and shapes are destroyed when their associated
+/// Joints and fixtures are destroyed when their associated
 /// body is destroyed. Implement this listener so that you
 /// may nullify references to these joints and shapes.
 class b2DestructionListener
@@ -42,9 +42,9 @@ public:
 	/// to the destruction of one of its attached bodies.
 	virtual void SayGoodbye(b2Joint* joint) = 0;
 
-	/// Called when any shape is about to be destroyed due
+	/// Called when any fixture is about to be destroyed due
 	/// to the destruction of its parent body.
-	virtual void SayGoodbye(b2Shape* shape) = 0;
+	virtual void SayGoodbye(b2Fixture* fixture) = 0;
 };
 
 
@@ -69,10 +69,10 @@ public:
 
 	/// Return true if contact calculations should be performed between these two shapes.
 	/// @warning for performance reasons this is only called when the AABBs begin to overlap.
-	virtual bool ShouldCollide(b2Shape* shape1, b2Shape* shape2);
+	virtual bool ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB);
 
 	/// Return true if the given shape should be considered for ray intersection
-	virtual bool RayCollide(void* userData, b2Shape* b2Shape);
+	virtual bool RayCollide(void* userData, b2Fixture* fixture);
 };
 
 /// The default contact filter.

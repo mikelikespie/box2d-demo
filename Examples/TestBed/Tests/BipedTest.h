@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -39,16 +39,16 @@ public:
 			sd.restitution = k_restitution;
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(0.0f, -10.0f), 0.5f * b2_pi);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 10.0f, b2Vec2(0.0f, 10.0f), -0.5f * b2_pi);
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 		}
 
 		m_biped = new Biped(m_world, b2Vec2(0.0f, 20.0f));
@@ -66,7 +66,7 @@ public:
 			sd.radius = 0.25f;
 			sd.density = 15.0f;
 			sd.restitution = k_restitution;
-			body->CreateShape(&sd);
+			body->CreateFixture(&sd);
 			body->SetMassFromShapes();
 		}
 	}

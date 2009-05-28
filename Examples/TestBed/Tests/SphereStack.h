@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -38,7 +38,7 @@ public:
 			bd.position.Set(0.0f, -10.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -53,7 +53,7 @@ public:
 
 				m_bodies[i] = m_world->CreateBody(&bd);
 
-				m_bodies[i]->CreateShape(&sd);
+				m_bodies[i]->CreateFixture(&sd);
 				m_bodies[i]->SetMassFromShapes();
 			}
 		}

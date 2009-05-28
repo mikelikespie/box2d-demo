@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -56,8 +56,8 @@ void ContactListener::Add(const b2ContactPoint* point)
 	}
 
 	ContactPoint* cp = test->m_points + test->m_pointCount;
-	cp->shape1 = point->shape1;
-	cp->shape2 = point->shape2;
+	cp->fixtureA = point->fixtureA;
+	cp->fixtureB = point->fixtureB;
 	cp->position = point->position;
 	cp->normal = point->normal;
 	cp->id = point->id;
@@ -74,8 +74,8 @@ void ContactListener::Persist(const b2ContactPoint* point)
 	}
 
 	ContactPoint* cp = test->m_points + test->m_pointCount;
-	cp->shape1 = point->shape1;
-	cp->shape2 = point->shape2;
+	cp->fixtureA = point->fixtureA;
+	cp->fixtureB = point->fixtureB;
 	cp->position = point->position;
 	cp->normal = point->normal;
 	cp->id = point->id;
@@ -92,8 +92,8 @@ void ContactListener::Remove(const b2ContactPoint* point)
 	}
 
 	ContactPoint* cp = test->m_points + test->m_pointCount;
-	cp->shape1 = point->shape1;
-	cp->shape2 = point->shape2;
+	cp->fixtureA = point->fixtureA;
+	cp->fixtureB = point->fixtureB;
 	cp->position = point->position;
 	cp->normal = point->normal;
 	cp->id = point->id;
@@ -158,18 +158,18 @@ void Test::MouseDown(const b2Vec2& p)
 
 	// Query the world for overlapping shapes.
 	const int32 k_maxCount = 10;
-	b2Shape* shapes[k_maxCount];
-	int32 count = m_world->Query(aabb, shapes, k_maxCount);
+	b2Fixture* fixtures[k_maxCount];
+	int32 count = m_world->Query(aabb, fixtures, k_maxCount);
 	b2Body* body = NULL;
 	for (int32 i = 0; i < count; ++i)
 	{
-		b2Body* shapeBody = shapes[i]->GetBody();
-		if (shapeBody->IsStatic() == false && shapeBody->GetMass() > 0.0f)
+		b2Body* b = fixtures[i]->GetBody();
+		if (b->IsStatic() == false && b->GetMass() > 0.0f)
 		{
-			bool inside = shapes[i]->TestPoint(shapeBody->GetXForm(), p);
+			bool inside = fixtures[i]->TestPoint(p);
 			if (inside)
 			{
-				body = shapes[i]->GetBody();
+				body = b;
 				break;
 			}
 		}
@@ -287,7 +287,7 @@ void Test::LaunchBomb(const b2Vec2& position, const b2Vec2& velocity)
 
 	if (inRange)
 	{
-		m_bomb->CreateShape(&sd);
+		m_bomb->CreateFixture(&sd);
 		m_bomb->SetMassFromShapes();
 	}
 }
@@ -323,7 +323,7 @@ void Test::Step(Settings* settings)
 	m_debugDraw.SetFlags(flags);
 
 	m_world->SetWarmStarting(settings->enableWarmStarting > 0);
-	m_world->SetContinuousPhysics(settings->enableTOI > 0);
+	m_world->SetContinuousPhysics(settings->enableContinuous > 0);
 
 	m_pointCount = 0;
 

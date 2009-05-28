@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2007-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -32,7 +32,7 @@ public:
 
 			b2PolygonDef sd;
 			sd.SetAsBox(50.0f, 10.0f);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -51,7 +51,7 @@ public:
 			b2BodyDef bd1;
 			bd1.position.Set(-3.0f, 12.0f);
 			b2Body* body1 = m_world->CreateBody(&bd1);
-			body1->CreateShape(&circle1);
+			body1->CreateFixture(&circle1);
 			body1->SetMassFromShapes();
 
 			b2RevoluteJointDef jd1;
@@ -65,7 +65,7 @@ public:
 			b2BodyDef bd2;
 			bd2.position.Set(0.0f, 12.0f);
 			b2Body* body2 = m_world->CreateBody(&bd2);
-			body2->CreateShape(&circle2);
+			body2->CreateFixture(&circle2);
 			body2->SetMassFromShapes();
 
 			b2RevoluteJointDef jd2;
@@ -75,7 +75,7 @@ public:
 			b2BodyDef bd3;
 			bd3.position.Set(2.5f, 12.0f);
 			b2Body* body3 = m_world->CreateBody(&bd3);
-			body3->CreateShape(&box);
+			body3->CreateFixture(&box);
 			body3->SetMassFromShapes();
 
 			b2PrismaticJointDef jd3;

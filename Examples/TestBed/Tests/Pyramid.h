@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -31,7 +31,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -10.0f);
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -40,9 +40,9 @@ public:
 			sd.SetAsBox(a, a);
 			sd.density = 5.0f;
 
-			b2Vec2 x(-10.0f, 1.0f);
+			b2Vec2 x(-10.0f, 0.75f);
 			b2Vec2 y;
-			b2Vec2 deltaX(0.5625f, 2.0f);
+			b2Vec2 deltaX(0.5625f, 1.25f);
 			b2Vec2 deltaY(1.125f, 0.0f);
 
 			for (int32 i = 0; i < 25; ++i)
@@ -54,7 +54,7 @@ public:
 					b2BodyDef bd;
 					bd.position = y;
 					b2Body* body = m_world->CreateBody(&bd);
-					body->CreateShape(&sd);
+					body->CreateFixture(&sd);
 					body->SetMassFromShapes();
 
 					y += deltaY;

@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 	groundShapeDef.SetAsBox(50.0f, 10.0f);
 
 	// Add the ground shape to the ground body.
-	groundBody->CreateShape(&groundShapeDef);
+	groundBody->CreateFixture(&groundShapeDef);
 
 	// Define the dynamic body. We set its position and call the body factory.
 	b2BodyDef bodyDef;
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 	shapeDef.friction = 0.3f;
 
 	// Add the shape to the body.
-	body->CreateShape(&shapeDef);
+	body->CreateFixture(&shapeDef);
 
 	// Now tell the dynamic body to compute it's mass properties base
 	// on its shape.

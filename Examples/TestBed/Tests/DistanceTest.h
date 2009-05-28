@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -25,31 +25,18 @@ public:
 	DistanceTest()
 	{
 		{
-			b2BodyDef bd;
-			bd.position.Set(0.0f, 20.0f);
-			m_body1 = m_world->CreateBody(&bd);
-
-			b2PolygonDef sd;
-			sd.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
-			m_shape1 = m_body1->CreateShape(&sd);
+			m_transformA.SetIdentity();
+			m_transformA.position.Set(0.0f, 20.0f);
+			m_polygonA.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
 		}
 
 		{
-			b2BodyDef bd;
-			bd.position.Set(-9.1892055008530633f, 17.037377814153160f);
-			bd.angle = -34.723153436328857f;
-			m_body2 = m_world->CreateBody(&bd);
+			m_positionB.Set(-9.1892055008530633f, 17.037377814153160f);
+			m_angleB = -34.723153436328857f;
+			m_transformB.Set(m_positionB, m_angleB);
 
-			b2PolygonDef sd;
-			sd.SetAsBox(0.1f, 4.0f);
-			m_shape2 = m_body2->CreateShape(&sd);
+			m_polygonB.SetAsBox(0.1f, 0.1f);
 		}
-
-		m_world->SetGravity(b2Vec2(0.0f, 0.0f));
-	}
-
-	~DistanceTest()
-	{
 	}
 
 	static Test* Create()
@@ -61,16 +48,39 @@ public:
 	{
 		Test::Step(settings);
 
-		b2Vec2 x1, x2;
-		float32 distance = b2Distance(&x1, &x2, m_shape1, m_body1->GetXForm(), m_shape2, m_body2->GetXForm());
+		b2DistanceInput input;
+		input.transformA = m_transformA;
+		input.transformB = m_transformB;
+		input.useRadii = true;
+		b2SimplexCache cache;
+		cache.count = 0;
+		b2DistanceOutput output;
+		b2Distance(&output, &cache, &input, &m_polygonA, &m_polygonB);
 
-		m_debugDraw.DrawString(5, m_textLine, "distance = %g", (float) distance);
+		m_debugDraw.DrawString(5, m_textLine, "distance = %g", output.distance);
 		m_textLine += 15;
 
-		extern int32 g_GJK_Iterations;
-
-		m_debugDraw.DrawString(5, m_textLine, "iterations = %d", g_GJK_Iterations);
+		m_debugDraw.DrawString(5, m_textLine, "iterations = %d", output.iterations);
 		m_textLine += 15;
+
+		{
+			b2Color color(0.9f, 0.9f, 0.9f);
+			b2Vec2 v[b2_maxPolygonVertices];
+			for (int32 i = 0; i < m_polygonA.m_vertexCount; ++i)
+			{
+				v[i] = b2Mul(m_transformA, m_polygonA.m_vertices[i]);
+			}
+			m_debugDraw.DrawPolygon(v, m_polygonA.m_vertexCount, color);
+
+			for (int32 i = 0; i < m_polygonB.m_vertexCount; ++i)
+			{
+				v[i] = b2Mul(m_transformB, m_polygonB.m_vertices[i]);
+			}
+			m_debugDraw.DrawPolygon(v, m_polygonB.m_vertexCount, color);
+		}
+
+		b2Vec2 x1 = output.pointA;
+		b2Vec2 x2 = output.pointB;
 
 		glPointSize(4.0f);
 		glColor4f(1.0f, 0.0f, 0.0f,1);
@@ -89,43 +99,43 @@ public:
 
 	void Keyboard(unsigned char key)
 	{
-		b2Vec2 p = m_body2->GetPosition();
-		float32 a = m_body2->GetAngle();
-
 		switch (key)
 		{
 		case 'a':
-			p.x -= 0.1f;
+			m_positionB.x -= 0.1f;
 			break;
 
 		case 'd':
-			p.x += 0.1f;
+			m_positionB.x += 0.1f;
 			break;
 
 		case 's':
-			p.y -= 0.1f;
+			m_positionB.y -= 0.1f;
 			break;
 
 		case 'w':
-			p.y += 0.1f;
+			m_positionB.y += 0.1f;
 			break;
 
 		case 'q':
-			a += 0.1f * b2_pi;
+			m_angleB += 0.1f * b2_pi;
 			break;
 
 		case 'e':
-			a -= 0.1f * b2_pi;
+			m_angleB -= 0.1f * b2_pi;
 			break;
 		}
 
-		m_body2->SetXForm(p, a);
+		m_transformB.Set(m_positionB, m_angleB);
 	}
 
-	b2Body* m_body1;
-	b2Body* m_body2;
-	b2Shape* m_shape1;
-	b2Shape* m_shape2;
+	b2Vec2 m_positionB;
+	float32 m_angleB;
+
+	b2XForm m_transformA;
+	b2XForm m_transformB;
+	b2PolygonShape m_polygonA;
+	b2PolygonShape m_polygonB;
 };
 
 #endif

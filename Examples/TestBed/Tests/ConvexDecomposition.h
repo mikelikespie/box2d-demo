@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007 Erin Catto http://www.gphysics.com
+ * Copyright (c) 2007-2009 Erin Catto http://www.gphysics.com
  *
  * This software is provided 'as-is', without any express or implied
  * warranty.  In no event will the authors be held liable for any damages
@@ -36,7 +36,7 @@ public:
             b2BodyDef bd;
             bd.position.Set(0.0f, -10.0f);
             b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 
         }
 		
@@ -97,7 +97,7 @@ public:
 			for (int i = 0; i<n; ++i) {
 				b2PolygonDef polydef = polyprot;
 				results[i].AddTo(polydef);
-				body->CreateShape(&polydef);
+				body->CreateFixture(&polydef);
 			}
 			delete[] results;*/
 			DecomposeConvexAndAddTo(&pgon, body, &polyprot);

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -24,6 +24,21 @@ class StaticEdges : public Test
 public:
 	StaticEdges()
 	{
+#if 0
+		{
+			b2CircleDef sd;
+			sd.radius = 0.5f;
+			sd.localPosition.SetZero();
+			sd.density = 2.0f;
+
+			b2BodyDef bd;
+			bd.position.Set(0.0f, 2.0f);
+			b2Body* body = m_world->CreateBody(&bd);
+			body->CreateFixture(&sd);
+			body->SetMassFromShapes();
+		}
+#endif
+
 		{
 			b2CircleDef sd1;
 			sd1.radius = 0.5f;
@@ -42,8 +57,8 @@ public:
 				bd.position.Set(x + 5.0f, 1.05f + 2.5f * i);
 				bd.angle = RandomFloat(-b2_pi, b2_pi);
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd1);
-				body->CreateShape(&sd2);
+				body->CreateFixture(&sd1);
+				body->CreateFixture(&sd2);
 				body->SetMassFromShapes();
 			}
 		}
@@ -64,8 +79,8 @@ public:
 				bd.position.Set(x - 5.0f, 1.05f + 2.5f * i);
 				bd.angle = RandomFloat(-b2_pi, b2_pi);
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd1);
-				body->CreateShape(&sd2);
+				body->CreateFixture(&sd1);
+				body->CreateFixture(&sd2);
 				body->SetMassFromShapes();
 			}
 		}
@@ -100,8 +115,8 @@ public:
 				bd.position.Set(x, 2.05f + 2.5f * i);
 				bd.angle = 0.0f;
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd1);
-				body->CreateShape(&sd2);
+				body->CreateFixture(&sd1);
+				body->CreateFixture(&sd2);
 				body->SetMassFromShapes();
 			}
 		}
@@ -208,31 +223,49 @@ public:
 				8.7757003f,6.4123542f
 			};
 			
-			b2Vec2 b2Loop1[87];
-			b2Vec2 b2Loop2[6];
+			float32 loop3[] = 
+			{
+				-5.0f, 10.0f,
+				5.0f, 10.0f,
+				5.0f, 0.0f,
+				-5.0f, 0.0f,
+			};
+
+			b2Vec2 pointLoop1[87];
+			b2Vec2 pointLoop2[6];
+			b2Vec2 pointLoop3[4];
 			
-			for (int32 i = 0; i < 87; i++) {
-				b2Loop1[i].Set(loop1[i*2] - 10.0f, loop1[i*2 + 1]);
+			for (int32 i = 0; i < 87; i++)
+			{
+				pointLoop1[i].Set(loop1[i*2] - 10.0f, loop1[i*2 + 1]);
 			}
 			
-			for (int32 i = 0; i < 6; i++) {
-				b2Loop2[i].Set(loop2[i*2] - 10.0f, loop2[i*2 + 1]);
+			for (int32 i = 0; i < 6; i++)
+			{
+				pointLoop2[i].Set(loop2[i*2] - 10.0f, loop2[i*2 + 1]);
 			}
 			
+			for (int32 i = 0; i < 4; i++)
+			{
+				pointLoop3[i].Set(loop3[i*2], loop3[i*2 + 1]);
+			}
+
 			b2BodyDef bd;
 			bd.position.Set( 0.0f, 0.0f );
 			b2Body* body = m_world->CreateBody(&bd);
 			
 			b2EdgeChainDef edgeDef;
 			edgeDef.vertexCount = 87;
-			edgeDef.vertices = b2Loop1;
-			body->CreateShape(&edgeDef);
+			edgeDef.vertices = pointLoop1;
+			b2CreateEdgeChain(body, &edgeDef);
 			
 			edgeDef.vertexCount = 6;
-			edgeDef.vertices = b2Loop2;
-			body->CreateShape(&edgeDef);
-			
-			//body->SetMassFromShapes();
+			edgeDef.vertices = pointLoop2;
+			b2CreateEdgeChain(body, &edgeDef);
+
+			//edgeDef.vertexCount = 4;
+			//edgeDef.vertices = pointLoop3;
+			//b2CreateEdgeChain(body, &edgeDef);
 		}
 	}
 

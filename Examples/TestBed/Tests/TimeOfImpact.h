@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -25,38 +25,12 @@ public:
 	TimeOfImpact()
 	{
 		{
-			b2PolygonDef sd;
-			sd.density = 0.0f;
-
-			//sd.SetAsBox(0.1f, 10.0f, b2Vec2(10.0f, 0.0f), 0.0f);
-			sd.SetAsBox(0.1f, 10.0f);
-
-			b2BodyDef bd;
-			//bd.position.Set(0.0f, 20.0f);
-			bd.position.Set(0.0f, 10.0f);
-			bd.angle = 0.0f;
-			m_body1 = m_world->CreateBody(&bd);
-			m_shape1 = m_body1->CreateShape(&sd);
+			m_shapeA.SetAsBox(0.1f, 10.0f);
 		}
 
 		{
-			b2PolygonDef sd;
-			sd.SetAsBox(0.25f, 0.5f);
-			sd.density = 1.0f;
-
-			b2BodyDef bd;
-			//bd.position.Set(9.6363468f, 28.050615f);
-			//bd.angle = 1.6408679f;
-			bd.position.Set(-1.0f, 10.0f);
-			bd.angle = 0.0f;
-			m_body2 = m_world->CreateBody(&bd);
-			m_shape2 = (b2PolygonShape*)m_body2->CreateShape(&sd);
-			m_body2->SetMassFromShapes();
+			m_shapeB.SetAsBox(0.25f, 0.5f);
 		}
-	}
-
-	~TimeOfImpact()
-	{
 	}
 
 	static Test* Create()
@@ -70,57 +44,57 @@ public:
 		Test::Step(settings);
 		settings->pause = 0;
 
-		b2Sweep sweep1;
-		//sweep1.c0.Set(0.0f, 20.0f);
-		sweep1.c0.Set(0.0f, 0.0f);
-		sweep1.a0 = 0.0f;
-		sweep1.c = sweep1.c0;
-		sweep1.a = sweep1.a0;
-		sweep1.t0 = 0.0f;
-		sweep1.localCenter = m_body1->GetLocalCenter();
+		b2Sweep sweepA;
+		sweepA.c0.Set(0.0f, 0.0f);
+		sweepA.a0 = 0.0f;
+		sweepA.c = sweepA.c0;
+		sweepA.a = sweepA.a0;
+		sweepA.t0 = 0.0f;
+		sweepA.localCenter.SetZero();
 
-		b2Sweep sweep2;
-		//sweep2.c0.Set(9.6363468f, 28.050615f);
-		//sweep2.a0 = 1.6408679f;
-		//sweep2.c = sweep2.c0 + b2Vec2(-0.075121880f, 0.27358246f);
-		//sweep2.a = sweep2.a0 - 10.434675f;
-		sweep2.c0.Set(-1.0f, 10.0f);
-		sweep2.a0 = 0.0f;
-		sweep2.c.Set(1.0f, 10.0f);
-		sweep2.a = 1.0f;
-		sweep2.t0 = 0.0f;
-		sweep2.localCenter = m_body2->GetLocalCenter();
+		b2Sweep sweepB;
+		sweepB.c0.Set(-1.0f, 10.0f);
+		sweepB.a0 = 0.0f;
+		sweepB.c.Set(1.0f, 10.0f);
+		sweepB.a = 1.0f;
+		sweepB.t0 = 0.0f;
+		sweepB.localCenter.SetZero();
 
-		float32 toi = b2TimeOfImpact(m_shape1, sweep1, m_shape2, sweep2);
+		b2TOIInput input;
+		input.sweepA = sweepA;
+		input.sweepB = sweepB;
+		input.sweepRadiusA = m_shapeA.ComputeSweepRadius(sweepA.localCenter);
+		input.sweepRadiusB = m_shapeB.ComputeSweepRadius(sweepB.localCenter);
+		input.tolerance = b2_linearSlop;
+
+		float32 toi = b2TimeOfImpact(&input, &m_shapeA, &m_shapeB);
 
 		m_debugDraw.DrawString(5, m_textLine, "toi = %g", (float) toi);
 		m_textLine += 15;
 
-		b2XForm xf2;
-		sweep2.GetXForm(&xf2, toi);
-		int32 vertexCount = m_shape2->GetVertexCount();
-		b2Vec2 vertices[b2_maxPolygonVertices];
-		const b2Vec2* localVertices;
-		
-		localVertices = m_shape2->GetVertices();
-		for (int32 i = 0; i < vertexCount; ++i)
 		{
-			vertices[i] = b2Mul(xf2, localVertices[i]);
+			m_debugDraw.DrawPolygon(m_shapeA.m_vertices, m_shapeA.m_vertexCount, b2Color(0.9f, 0.9f, 0.9f));
 		}
-		m_debugDraw.DrawPolygon(vertices, vertexCount, b2Color(0.5f, 0.7f, 0.9f));
 
-		localVertices = m_shape2->GetCoreVertices();
-		for (int32 i = 0; i < vertexCount; ++i)
+		b2Vec2 vertices[b2_maxPolygonVertices];
+		b2XForm transformB;
+		sweepB.GetTransform(&transformB, 0.0f);
+		for (int32 i = 0; i < m_shapeB.m_vertexCount; ++i)
 		{
-			vertices[i] = b2Mul(xf2, localVertices[i]);
+			vertices[i] = b2Mul(transformB, m_shapeB.m_vertices[i]);
 		}
-		m_debugDraw.DrawPolygon(vertices, vertexCount, b2Color(0.5f, 0.7f, 0.9f));
+		m_debugDraw.DrawPolygon(vertices, m_shapeB.m_vertexCount, b2Color(0.9f, 0.9f, 0.9f));
+
+		sweepB.GetTransform(&transformB, toi);
+		for (int32 i = 0; i < m_shapeB.m_vertexCount; ++i)
+		{
+			vertices[i] = b2Mul(transformB, m_shapeB.m_vertices[i]);
+		}
+		m_debugDraw.DrawPolygon(vertices, m_shapeB.m_vertexCount, b2Color(0.5f, 0.7f, 0.9f));
 	}
 
-	b2Body* m_body1;
-	b2Body* m_body2;
-	b2Shape* m_shape1;
-	b2PolygonShape* m_shape2;
+	b2PolygonShape m_shapeA;
+	b2PolygonShape m_shapeB;
 };
 
 #endif

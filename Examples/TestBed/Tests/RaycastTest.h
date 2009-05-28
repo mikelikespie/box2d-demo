@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2007 Erin Catto http://www.gphysics.com
+* Copyright (c) 2007-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -34,7 +34,7 @@ public:
 
 			b2PolygonDef sd;
 			sd.SetAsBox(50.0f, 10.0f);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -45,7 +45,7 @@ public:
 			b2PolygonDef sd;
 			sd.SetAsBox(5.0f, 1.0f);
 			sd.density = 4.0;
-			laserBody->CreateShape(&sd);
+			laserBody->CreateFixture(&sd);
 			laserBody->SetMassFromShapes();
 
 			b2Body* body;
@@ -55,12 +55,12 @@ public:
 
 			b2CircleDef cd;
 			cd.radius = 3;
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
 
 			bd.position.Set(5.0f, 10.0f);
 			body = m_world->CreateBody(&bd);
 
-			body->CreateShape(&cd);
+			body->CreateFixture(&cd);
 		}
 	}
 
@@ -90,11 +90,11 @@ public:
 
 			float32 lambda=1;
 			b2Vec2 normal;
-			b2Shape* shape = m_world->RaycastOne(segment,&lambda,&normal,false,NULL);
+			b2Fixture* fixture = m_world->RaycastOne(segment,&lambda,&normal,false,NULL);
 
 			b2Color laserColor(255,0,0);
 
-			if(shape)
+			if(fixture)
 			{
 				m_debugDraw.DrawSegment(segment.p1,(1-lambda)*segment.p1+lambda*segment.p2,laserColor);
 			}

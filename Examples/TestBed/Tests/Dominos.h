@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2006-2008 Erin Catto http://www.gphysics.com
+* Copyright (c) 2006-2009 Erin Catto http://www.gphysics.com
 *
 * This software is provided 'as-is', without any express or implied
 * warranty.  In no event will the authors be held liable for any damages
@@ -33,7 +33,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(0.0f, -10.0f);
 			b1 = m_world->CreateBody(&bd);
-			b1->CreateShape(&sd);
+			b1->CreateFixture(&sd);
 		}
 
 		{
@@ -43,7 +43,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-1.5f, 10.0f);
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		{
@@ -57,7 +57,7 @@ public:
 				b2BodyDef bd;
 				bd.position.Set(-6.0f + 1.0f * i, 11.25f);
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd);
+				body->CreateFixture(&sd);
 				body->SetMassFromShapes();
 			}
 		}
@@ -69,7 +69,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(1.0f, 6.0f);
 			b2Body* ground = m_world->CreateBody(&bd);
-			ground->CreateShape(&sd);
+			ground->CreateFixture(&sd);
 		}
 
 		b2Body* b2;
@@ -80,7 +80,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-7.0f, 4.0f);
 			b2 = m_world->CreateBody(&bd);
-			b2->CreateShape(&sd);
+			b2->CreateFixture(&sd);
 		}
 
 		b2Body* b3;
@@ -94,7 +94,7 @@ public:
 			bd.angle = -0.15f;
 
 			b3 = m_world->CreateBody(&bd);
-			b3->CreateShape(&sd);
+			b3->CreateFixture(&sd);
 			b3->SetMassFromShapes();
 		}
 
@@ -115,7 +115,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(-10.0f, 15.0f);
 			b4 = m_world->CreateBody(&bd);
-			b4->CreateShape(&sd);
+			b4->CreateFixture(&sd);
 			b4->SetMassFromShapes();
 		}
 
@@ -134,13 +134,13 @@ public:
 			sd.friction = 0.1f;
 
 			sd.SetAsBox(1.0f, 0.1f, b2Vec2(0.0f, -0.9f), 0.0f);
-			b5->CreateShape(&sd);
+			b5->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 1.0f, b2Vec2(-0.9f, 0.0f), 0.0f);
-			b5->CreateShape(&sd);
+			b5->CreateFixture(&sd);
 
 			sd.SetAsBox(0.1f, 1.0f, b2Vec2(0.9f, 0.0f), 0.0f);
-			b5->CreateShape(&sd);
+			b5->CreateFixture(&sd);
 
 			b5->SetMassFromShapes();
 		}
@@ -159,7 +159,7 @@ public:
 			b2BodyDef bd;
 			bd.position.Set(6.5f, 4.1f);
 			b6 = m_world->CreateBody(&bd);
-			b6->CreateShape(&sd);
+			b6->CreateFixture(&sd);
 			b6->SetMassFromShapes();
 		}
 
@@ -177,7 +177,7 @@ public:
 			bd.position.Set(7.4f, 1.0f);
 
 			b7 = m_world->CreateBody(&bd);
-			b7->CreateShape(&sd);
+			b7->CreateFixture(&sd);
 			b7->SetMassFromShapes();
 		}
 
@@ -200,7 +200,7 @@ public:
 				b2BodyDef bd;
 				bd.position.Set(5.9f + 2.0f * sd.radius * i, 2.4f);
 				b2Body* body = m_world->CreateBody(&bd);
-				body->CreateShape(&sd);
+				body->CreateFixture(&sd);
 				body->SetMassFromShapes();
 			}
 		}
