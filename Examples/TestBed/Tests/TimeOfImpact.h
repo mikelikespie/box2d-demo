@@ -25,11 +25,11 @@ public:
 	TimeOfImpact()
 	{
 		{
-			m_shapeA.SetAsBox(0.1f, 10.0f);
+			m_shapeA.SetAsBox(10.0f, 0.2f);
 		}
 
 		{
-			m_shapeB.SetAsBox(0.25f, 0.5f);
+			m_shapeB.SetAsBox(2.0f, 0.1f);
 		}
 	}
 
@@ -40,12 +40,10 @@ public:
 
 	void Step(Settings* settings)
 	{
-		settings->pause = 1;
 		Test::Step(settings);
-		settings->pause = 0;
 
 		b2Sweep sweepA;
-		sweepA.c0.Set(0.0f, 0.0f);
+		sweepA.c0.Set(0.0f, -0.2f);
 		sweepA.a0 = 0.0f;
 		sweepA.c = sweepA.c0;
 		sweepA.a = sweepA.a0;
@@ -53,10 +51,10 @@ public:
 		sweepA.localCenter.SetZero();
 
 		b2Sweep sweepB;
-		sweepB.c0.Set(-1.0f, 10.0f);
-		sweepB.a0 = 0.0f;
-		sweepB.c.Set(1.0f, 10.0f);
-		sweepB.a = 1.0f;
+		sweepB.c0.Set(-0.076157160f, 0.16447277f);
+		sweepB.a0 = -9.4497271f;
+		sweepB.c.Set(-0.25650328f, -0.63657403f);
+		sweepB.a = -9.0383911f;
 		sweepB.t0 = 0.0f;
 		sweepB.localCenter.SetZero();
 
@@ -72,18 +70,27 @@ public:
 		m_debugDraw.DrawString(5, m_textLine, "toi = %g", (float) toi);
 		m_textLine += 15;
 
-		{
-			m_debugDraw.DrawPolygon(m_shapeA.m_vertices, m_shapeA.m_vertexCount, b2Color(0.9f, 0.9f, 0.9f));
-		}
+		extern int32 b2_maxToiIters, b2_maxToiRootIters;
+		m_debugDraw.DrawString(5, m_textLine, "max toi iters = %d, max root iters = %d", b2_maxToiIters, b2_maxToiRootIters);
+		m_textLine += 15;
 
 		b2Vec2 vertices[b2_maxPolygonVertices];
+
+		b2XForm transformA;
+		sweepA.GetTransform(&transformA, 0.0f);
+		for (int32 i = 0; i < m_shapeA.m_vertexCount; ++i)
+		{
+			vertices[i] = b2Mul(transformA, m_shapeA.m_vertices[i]);
+		}
+		m_debugDraw.DrawPolygon(vertices, m_shapeA.m_vertexCount, b2Color(0.9f, 0.9f, 0.9f));
+
 		b2XForm transformB;
 		sweepB.GetTransform(&transformB, 0.0f);
 		for (int32 i = 0; i < m_shapeB.m_vertexCount; ++i)
 		{
 			vertices[i] = b2Mul(transformB, m_shapeB.m_vertices[i]);
 		}
-		m_debugDraw.DrawPolygon(vertices, m_shapeB.m_vertexCount, b2Color(0.9f, 0.9f, 0.9f));
+		m_debugDraw.DrawPolygon(vertices, m_shapeB.m_vertexCount, b2Color(0.5f, 0.9f, 0.5f));
 
 		sweepB.GetTransform(&transformB, toi);
 		for (int32 i = 0; i < m_shapeB.m_vertexCount; ++i)
@@ -91,6 +98,13 @@ public:
 			vertices[i] = b2Mul(transformB, m_shapeB.m_vertices[i]);
 		}
 		m_debugDraw.DrawPolygon(vertices, m_shapeB.m_vertexCount, b2Color(0.5f, 0.7f, 0.9f));
+
+		sweepB.GetTransform(&transformB, 1.0f);
+		for (int32 i = 0; i < m_shapeB.m_vertexCount; ++i)
+		{
+			vertices[i] = b2Mul(transformB, m_shapeB.m_vertices[i]);
+		}
+		m_debugDraw.DrawPolygon(vertices, m_shapeB.m_vertexCount, b2Color(0.9f, 0.5f, 0.5f));
 	}
 
 	b2PolygonShape m_shapeA;

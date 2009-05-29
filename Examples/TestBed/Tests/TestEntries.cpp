@@ -69,13 +69,13 @@
 TestEntry g_testEntries[] =
 {
 	{"CCD Test", CCDTest::Create},
+	{"Time of Impact", TimeOfImpact::Create},
+	{"Distance Test", DistanceTest::Create},
 	{"Static Edges", StaticEdges::Create},
 	{"Pyramid And Static Edges", PyramidStaticEdges::Create},
 	{"Vertical Stack", VerticalStack::Create},
 	{"SphereStack", SphereStack::Create},
 	{"PolyCollision", PolyCollision::Create},
-	{"Time of Impact", TimeOfImpact::Create},
-	{"Distance Test", DistanceTest::Create},
 	{"Dynamic Tree", DynamicTreeTest::Create},
 	{"Dynamic Edges", DynamicEdges::Create},
 	{"Line Joint", LineJoint::Create},

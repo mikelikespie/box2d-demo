@@ -217,6 +217,7 @@ void b2Simplex::Solve2()
 		// a2 <= 0, so we clamp it to 0
 		m_v1.a = 1.0f;
 		m_count = 1;
+		return;
 	}
 
 	// w2 region
@@ -227,6 +228,7 @@ void b2Simplex::Solve2()
 		m_v2.a = 1.0f;
 		m_count = 1;
 		m_v1 = m_v2;
+		return;
 	}
 
 	// Must be in e12 region.

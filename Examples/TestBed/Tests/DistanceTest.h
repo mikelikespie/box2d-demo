@@ -26,16 +26,16 @@ public:
 	{
 		{
 			m_transformA.SetIdentity();
-			m_transformA.position.Set(0.0f, 20.0f);
-			m_polygonA.SetAsBox(0.1f, 10.0f, b2Vec2(-10.0f, 0.0f), 0.0f);
+			m_transformA.position.Set(0.0f, -0.2f);
+			m_polygonA.SetAsBox(10.0f, 0.2f);
 		}
 
 		{
-			m_positionB.Set(-9.1892055008530633f, 17.037377814153160f);
-			m_angleB = -34.723153436328857f;
+			m_positionB.Set(12.017401f, 0.13678508f);
+			m_angleB = -0.0109265f;
 			m_transformB.Set(m_positionB, m_angleB);
 
-			m_polygonB.SetAsBox(0.1f, 0.1f);
+			m_polygonB.SetAsBox(2.0f, 0.1f);
 		}
 	}
 

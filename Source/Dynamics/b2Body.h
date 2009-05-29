@@ -127,7 +127,7 @@ public:
 	/// @param massData the mass properties.
 	void SetMassData(const b2MassData* data);
 
-	/// Compute the mass properties from the attached shapes. You typically call this
+	/// Compute the mass properties from the attached fixture. You typically call this
 	/// after adding all the fixtures. If you add or remove fixtures later, you may want
 	/// to call this again. Note that this changes the center of mass position.
 	void SetMassFromShapes();

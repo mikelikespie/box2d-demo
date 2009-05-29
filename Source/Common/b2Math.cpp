@@ -49,33 +49,3 @@ b2Vec2 b2Mat33::Solve22(const b2Vec2& b) const
 	x.y = det * (a11 * b.y - a21 * b.x);
 	return x;
 }
-
-void b2Sweep::GetTransform(b2XForm* xf, float32 alpha) const
-{
-	// center = p + R * localCenter
-	if (1.0f - t0 > B2_FLT_EPSILON)
-	{
-		xf->position = (1.0f - alpha) * c0 + alpha * c;
-		float32 angle = (1.0f - alpha) * a0 + alpha * a;
-		xf->R.Set(angle);
-	}
-	else
-	{
-		xf->position = c;
-		xf->R.Set(a);
-	}
-
-	// Shift to origin
-	xf->position -= b2Mul(xf->R, localCenter);
-}
-
-void b2Sweep::Advance(float32 t)
-{
-	if (t0 < t && 1.0f - t0 > B2_FLT_EPSILON)
-	{
-		float32 alpha = (t - t0) / (1.0f - t0);
-		c0 = (1.0f - alpha) * c0 + alpha * c;
-		a0 = (1.0f - alpha) * a0 + alpha * a;
-		t0 = t;
-	}
-}

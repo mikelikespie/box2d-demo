@@ -327,11 +327,6 @@ void Test::Step(Settings* settings)
 
 	m_pointCount = 0;
 
-	if (m_stepCount == 18)
-	{
-		m_stepCount += 0;
-	}
-
 	m_world->Step(timeStep, settings->velocityIterations, settings->positionIterations);
 
 	if (timeStep > 0.0f)
