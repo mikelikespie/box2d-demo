@@ -34,7 +34,6 @@
 #include "Car.h"
 #include "CCDTest.h"
 #include "Chain.h"
-#include "ContactCallbackTest.h"
 #include "CollisionFiltering.h"
 #include "CollisionProcessing.h"
 #include "CompoundShapes.h"
@@ -69,12 +68,12 @@
 TestEntry g_testEntries[] =
 {
 	{"CCD Test", CCDTest::Create},
+	{"SphereStack", SphereStack::Create},
+	{"Vertical Stack", VerticalStack::Create},
 	{"Time of Impact", TimeOfImpact::Create},
 	{"Distance Test", DistanceTest::Create},
 	{"Static Edges", StaticEdges::Create},
 	{"Pyramid And Static Edges", PyramidStaticEdges::Create},
-	{"Vertical Stack", VerticalStack::Create},
-	{"SphereStack", SphereStack::Create},
 	{"PolyCollision", PolyCollision::Create},
 	{"Dynamic Tree", DynamicTreeTest::Create},
 	{"Dynamic Edges", DynamicEdges::Create},
@@ -87,7 +86,6 @@ TestEntry g_testEntries[] =
 	{"Breakable Body", BreakableBody::Create},
 	{"Polygon Shapes", PolyShapes::Create},
 	{"Theo Jansen's Walker", TheoJansen::Create},
-	{"Contact Callback Test", ContactCB::Create},
 	{"Web", Web::Create},
 	{"Varying Friction", VaryingFriction::Create},
 	{"Varying Restitution", VaryingRestitution::Create},

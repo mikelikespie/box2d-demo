@@ -78,7 +78,7 @@ public:
 		m_joints[m_jointCount++] = joint;
 	}
 
-	void Report(b2ContactConstraint* constraints);
+	void Report(const b2ContactConstraint* constraints);
 
 	b2StackAllocator* m_allocator;
 	b2ContactListener* m_listener;

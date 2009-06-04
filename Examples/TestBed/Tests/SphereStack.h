@@ -31,11 +31,15 @@ public:
 	SphereStack()
 	{
 		{
-			b2PolygonDef sd;
-			sd.SetAsBox(50.0f, 10.0f);
+			//b2PolygonDef sd;
+			//sd.SetAsBox(50.0f, 10.0f);
+
+			b2EdgeDef sd;
+			sd.vertex1.Set(-20.0f, 0.0f);
+			sd.vertex2.Set(20.0f, 0.0f);
 
 			b2BodyDef bd;
-			bd.position.Set(0.0f, -10.0f);
+			//bd.position.Set(0.0f, -10.0f);
 
 			b2Body* ground = m_world->CreateBody(&bd);
 			ground->CreateFixture(&sd);
@@ -49,12 +53,14 @@ public:
 			for (int32 i = 0; i < e_count; ++i)
 			{
 				b2BodyDef bd;
-				bd.position.Set(0.0, 2.0f + 3.0f * i);
+				bd.position.Set(0.0, 4.0f + 3.0f * i);
 
 				m_bodies[i] = m_world->CreateBody(&bd);
 
 				m_bodies[i]->CreateFixture(&sd);
 				m_bodies[i]->SetMassFromShapes();
+
+				//m_bodies[i]->SetLinearVelocity(b2Vec2(0.0f, -100.0f));
 			}
 		}
 	}

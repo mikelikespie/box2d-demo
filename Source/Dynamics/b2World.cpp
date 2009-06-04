@@ -444,13 +444,14 @@ void b2World::Solve(const b2TimeStep& step)
 			for (b2ContactEdge* cn = b->m_contactList; cn; cn = cn->next)
 			{
 				// Has this contact already been added to an island?
+				// Is this contact non-solid (involves a sensor).
 				if (cn->contact->m_flags & (b2Contact::e_islandFlag | b2Contact::e_nonSolidFlag))
 				{
 					continue;
 				}
 
 				// Is this contact touching?
-				if (cn->contact->GetManifoldCount() == 0)
+				if ((cn->contact->m_flags & b2Contact::e_touchFlag) == 0)
 				{
 					continue;
 				}
@@ -669,7 +670,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 		minContact->Update(m_contactListener);
 		minContact->m_flags &= ~b2Contact::e_toiFlag;
 
-		if (minContact->GetManifoldCount() == 0)
+		if ((minContact->m_flags & b2Contact::e_touchFlag) == 0)
 		{
 			// This shouldn't happen. Numerical error?
 			//b2Assert(false);
@@ -726,7 +727,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 				}
 
 				// Is this contact touching? For performance we are not updating this contact.
-				if (cEdge->contact->GetManifoldCount() == 0)
+				if ((cEdge->contact->m_flags & b2Contact::e_touchFlag) == 0)
 				{
 					continue;
 				}

@@ -28,7 +28,7 @@
 int32 b2_maxToiIters = 0;
 int32 b2_maxToiRootIters = 0;
 
-#if 1
+#if 0
 // This algorithm uses conservative advancement to compute the time of
 // impact (TOI) of two shapes.
 // Refs: Bullet, Young Kim
@@ -283,6 +283,7 @@ float32 b2TimeOfImpact(const b2TOIInput* input, const TA* shapeA, const TB* shap
 	b2Assert(sweepA.t0 == sweepB.t0);
 	b2Assert(1.0f - sweepA.t0 > B2_FLT_EPSILON);
 
+	float32 radius = shapeA->m_radius + shapeB->m_radius;
 	float32 tolerance = input->tolerance;
 
 	float32 alpha = 0.0f;
@@ -328,18 +329,19 @@ float32 b2TimeOfImpact(const b2TOIInput* input, const TA* shapeA, const TB* shap
 		if (iter == 0)
 		{
 			// Compute a reasonable target distance to give some breathing room
-			// for conservative advancement.
-			if (separation > 2.0f * tolerance)
+			// for conservative advancement. We take advantage of the shape radii
+			// to create additional clearance.
+			if (separation > radius)
 			{
-				target = 1.5f * tolerance;
+				target = b2Max(radius - tolerance, 0.75f * radius);
 			}
 			else
 			{
-				target = b2Max(0.05f * tolerance, separation - 0.5f * tolerance);
+				target = b2Max(separation - tolerance, 0.02f * radius);
 			}
 		}
 
-		if (separation - target < 0.03f * tolerance)
+		if (separation - target < 0.5f * tolerance)
 		{
 			if (iter == 0)
 			{

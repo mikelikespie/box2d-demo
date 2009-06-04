@@ -22,6 +22,7 @@
 #include "../Common/b2Math.h"
 #include <limits.h>
 
+/// Inpute parameters for b2TimeOfImpact
 struct b2TOIInput
 {
 	b2Sweep sweepA;
@@ -32,6 +33,9 @@ struct b2TOIInput
 };
 
 /// Compute the time when two shapes begin to touch or touch at a closer distance.
+/// TOI considers the shape radii. It attempts to have the radii overlap by the tolerance.
+/// Iterations terminate with the overlap is within 0.5 * tolerance. The tolerance should be
+/// smaller than sum of the shape radii.
 /// @warning the sweeps must have the same time interval.
 /// @return the fraction between [0,1] in which the shapes first touch.
 /// fraction=0 means the shapes begin touching/overlapped, and fraction=1 means the shapes don't touch.

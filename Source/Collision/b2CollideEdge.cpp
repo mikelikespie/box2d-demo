@@ -21,88 +21,90 @@
 #include "Shapes/b2EdgeShape.h"
 #include "Shapes/b2PolygonShape.h"
 
+
+// This implements 2-sided edge vs circle collision.
 void b2CollideEdgeAndCircle(b2Manifold* manifold,
 							const b2EdgeShape* edge, 
 							const b2XForm& transformA,
 							const b2CircleShape* circle, 
 							const b2XForm& transformB)
 {
-	manifold->pointCount = 0;
-	b2Vec2 d;
-	b2Vec2 c = b2Mul(transformB, circle->m_p);
-	b2Vec2 cLocal = b2MulT(transformA, c);
-	b2Vec2 n = edge->GetNormalVector();
-	b2Vec2 v1 = edge->GetVertex1();
-	b2Vec2 v2 = edge->GetVertex2();
+	manifold->m_pointCount = 0;
+	b2Vec2 cLocal = b2MulT(transformA, b2Mul(transformB, circle->m_p));
+	b2Vec2 normal = edge->m_normal;
+	b2Vec2 v1 = edge->m_v1;
+	b2Vec2 v2 = edge->m_v2;
 	float32 radius = edge->m_radius + circle->m_radius;
-	float32 separation;
 
-	float32 dirDist = b2Dot((cLocal - v1), edge->GetDirectionVector());
+	// Barycentric coordinates
+	float32 u1 = b2Dot(cLocal - v1, v2 - v1);
+	float32 u2 = b2Dot(cLocal - v2, v1 - v2);
 
-	if (dirDist <= 0.0f)
+	if (u1 <= 0.0f)
 	{
 		// Behind v1
-		d = cLocal - v1;
-		if (b2Dot(d, edge->GetCorner1Vector()) < 0.0f)
+		if (b2DistanceSquared(cLocal, v1) > radius * radius)
 		{
-			// Contact handled by previous edge
 			return;
 		}
-		d = c - b2Mul(transformA, v1);
+
+		manifold->m_pointCount = 1;
+		manifold->m_type = b2Manifold::e_faceA;
+		manifold->m_localPlaneNormal = cLocal - v1;
+		manifold->m_localPlaneNormal.Normalize();
+		manifold->m_localPoint = v1;
+		manifold->m_points[0].m_localPoint = circle->m_p;
+		manifold->m_points[0].m_id.key = 0;
 	}
-	else if (dirDist >= edge->GetLength())
+	else if (u2 <= 0.0f)
 	{
 		// Ahead of v2
-		d = cLocal - v2;
-		if (b2Dot(d, edge->GetCorner2Vector()) > 0.0f)
-		{
-			// Contact handled by next edge
-			return;
-		}
-		d = c - b2Mul(transformA, v2);
-	}
-	else
-	{
-		separation = b2Dot(cLocal - v1, n);
-		if (separation > radius || separation < -radius)
+		if (b2DistanceSquared(cLocal, v2) > radius * radius)
 		{
 			return;
 		}
-		separation -= radius;
-		manifold->normal = b2Mul(transformA.R, n);
-		manifold->pointCount = 1;
-		manifold->points[0].id.key = 0;
-		manifold->points[0].separation = separation;
-		c = c - radius * manifold->normal;
-		manifold->points[0].localPointA = b2MulT(transformA, c);
-		manifold->points[0].localPointB = b2MulT(transformB, c);
-		return;
-	}
 
-	float32 distSqr = d.LengthSquared();
-	if (distSqr > radius * radius)
-	{
-		return;
-	}
-
-	if (distSqr < B2_FLT_EPSILON)
-	{
-		separation = -radius;
-		manifold->normal = b2Mul(transformA.R, n);
+		manifold->m_pointCount = 1;
+		manifold->m_type = b2Manifold::e_faceA;
+		manifold->m_localPlaneNormal = cLocal - v2;
+		manifold->m_localPlaneNormal.Normalize();
+		manifold->m_localPoint = v2;
+		manifold->m_points[0].m_localPoint = circle->m_p;
+		manifold->m_points[0].m_id.key = 0;
 	}
 	else
 	{
-		separation = d.Normalize() - radius;
-		manifold->normal = d;
+		float32 separation = b2Dot(cLocal - v1, normal);
+		if (separation < -radius || radius < separation)
+		{
+			return;
+		}
+		
+		manifold->m_pointCount = 1;
+		manifold->m_type = b2Manifold::e_faceA;
+		manifold->m_localPlaneNormal = separation < 0.0f ? -normal : normal;
+		manifold->m_localPoint = 0.5f * (v1 + v2);
+		manifold->m_points[0].m_localPoint = circle->m_p;
+		manifold->m_points[0].m_id.key = 0;
 	}
-
-	manifold->pointCount = 1;
-	manifold->points[0].id.key = 0;
-	manifold->points[0].separation = separation;
-	c = c - radius * manifold->normal;
-	manifold->points[0].localPointA = b2MulT(transformA, c);
-	manifold->points[0].localPointB = b2MulT(transformB, c);
 }
+
+#if 1
+
+// Polygon versus 2-sided edge.
+void b2CollidePolyAndEdge(b2Manifold* manifold,
+						  const b2PolygonShape* polygon, 
+						  const b2XForm& transformA,
+						  const b2EdgeShape* edge, 
+						  const b2XForm& transformB)
+{
+	b2PolygonShape polygonB;
+	polygonB.SetAsEdge(edge->m_v1, edge->m_v2);
+
+	b2CollidePolygons(manifold, polygon, transformA, &polygonB, transformB);
+}
+
+#else
 
 void b2CollidePolyAndEdge(b2Manifold* manifold,
 							const b2PolygonShape* polygon, 
@@ -110,7 +112,7 @@ void b2CollidePolyAndEdge(b2Manifold* manifold,
 							const b2EdgeShape* edge, 
 							const b2XForm& transformB)
 {
-	manifold->pointCount = 0;
+	manifold->m_pointCount = 0;
 	b2Vec2 v1 = b2Mul(transformB, edge->GetVertex1());
 	b2Vec2 v2 = b2Mul(transformB, edge->GetVertex2());
 	b2Vec2 n = b2Mul(transformB.R, edge->GetNormalVector());
@@ -251,45 +253,44 @@ void b2CollidePolyAndEdge(b2Manifold* manifold,
 				}
 			}
 
-			manifold->pointCount = 1;
-			manifold->normal = b2Mul(transformA.R, normals[separationIndex]);
-			manifold->points[0].separation = separationMax - totalRadius;
-			manifold->points[0].id.features.incidentEdge = (uint8)separationIndex;
-			manifold->points[0].id.features.incidentVertex = b2_nullFeature;
-			manifold->points[0].id.features.referenceEdge = 0;
-			manifold->points[0].id.features.flip = 0;
+			manifold->m_pointCount = 1;
+			manifold->m_type = b2Manifold::e_faceA
+			manifold->m_localPlaneNormal = normals[separationIndex];
+			manifold->m_points[0].m_id.key = 0;
+			manifold->m_points[0].m_id.features.incidentEdge = (uint8)separationIndex;
+			manifold->m_points[0].m_id.features.incidentVertex = b2_nullFeature;
+			manifold->m_points[0].m_id.features.referenceEdge = 0;
+			manifold->m_points[0].m_id.features.flip = 0;
 			if (separationV1)
 			{
-				manifold->points[0].localPointA = v1Local;
-				manifold->points[0].localPointB = edge->GetVertex1();
+				manifold->m_points[0].m_localPoint = edge->GetVertex1();
 			}
 			else
 			{
-				manifold->points[0].localPointA = v2Local;
-				manifold->points[0].localPointB = edge->GetVertex2();
+				manifold->m_points[0].m_localPoint = edge->GetVertex2();
 			}
 			return;
 		}
 	}
 
 	// We're going to use the edge's normal now.
-	manifold->normal = -n;
+	manifold->m_localPlaneNormal = edge->GetNormalVector();
+	manifold->m_localPoint = 0.5f * (edge->m_v1 + edge->m_v2);
 
 	// Check whether we only need one contact point.
 	if (enterEndIndex == exitStartIndex)
 	{
-		manifold->pointCount = 1;
-		manifold->points[0].id.features.incidentEdge = (uint8)enterEndIndex;
-		manifold->points[0].id.features.incidentVertex = b2_nullFeature;
-		manifold->points[0].id.features.referenceEdge = 0;
-		manifold->points[0].id.features.flip = 0;
-		manifold->points[0].localPointA = vertices[enterEndIndex];
-		manifold->points[0].localPointB = b2MulT(transformB, b2Mul(transformA, vertices[enterEndIndex]));
-		manifold->points[0].separation = enterSepN - totalRadius;
+		manifold->m_pointCount = 1;
+		manifold->m_points[0].m_id.key = 0;
+		manifold->m_points[0].m_id.features.incidentEdge = (uint8)enterEndIndex;
+		manifold->m_points[0].m_id.features.incidentVertex = b2_nullFeature;
+		manifold->m_points[0].m_id.features.referenceEdge = 0;
+		manifold->m_points[0].m_id.features.flip = 0;
+		manifold->m_points[0].m_localPoint = vertices[enterEndIndex];
 		return;
 	}
 
-	manifold->pointCount = 2;
+	manifold->m_pointCount = 2;
 
 	// dirLocal should be the edge's direction vector, but in the frame of the polygon.
 	b2Vec2 dirLocal = b2Cross(nLocal, -1.0f); // TODO: figure out why this optimization didn't work
@@ -309,55 +310,40 @@ void b2CollidePolyAndEdge(b2Manifold* manifold,
 	}
 	dirProj2 = b2Dot(dirLocal, vertices[exitStartIndex] - v1Local);
 
-	manifold->points[0].id.features.incidentEdge = (uint8)enterEndIndex;
-	manifold->points[0].id.features.incidentVertex = b2_nullFeature;
-	manifold->points[0].id.features.referenceEdge = 0;
-	manifold->points[0].id.features.flip = 0;
+	manifold->m_points[0].m_id.key = 0;
+	manifold->m_points[0].m_id.features.incidentEdge = (uint8)enterEndIndex;
+	manifold->m_points[0].m_id.features.incidentVertex = b2_nullFeature;
+	manifold->m_points[0].m_id.features.referenceEdge = 0;
+	manifold->m_points[0].m_id.features.flip = 0;
 
 	if (dirProj1 > edge->GetLength())
 	{
-		manifold->points[0].localPointA = v2Local;
-		manifold->points[0].localPointB = edge->GetVertex2();
-		float32 ratio = (edge->GetLength() - dirProj2) / (dirProj1 - dirProj2);
-		if (ratio > 100.0f * B2_FLT_EPSILON && ratio < 1.0f)
-		{
-			manifold->points[0].separation = exitSepN * (1.0f - ratio) + enterSepN * ratio - totalRadius;
-		}
-		else
-		{
-			manifold->points[0].separation = enterSepN - totalRadius;
-		}
+		manifold->m_points[0].localPointA = v2Local;
+		manifold->m_points[0].localPointB = edge->GetVertex2();
 	}
 	else
 	{
-		manifold->points[0].localPointA = vertices[enterEndIndex];
-		manifold->points[0].localPointB = b2MulT(transformB, b2Mul(transformA, vertices[enterEndIndex]));
-		manifold->points[0].separation = enterSepN - totalRadius;
+		manifold->m_points[0].localPointA = vertices[enterEndIndex];
+		manifold->m_points[0].localPointB = b2MulT(transformB, b2Mul(transformA, vertices[enterEndIndex]));
 	}
 
-	manifold->points[1].id.features.incidentEdge = (uint8)exitStartIndex;
-	manifold->points[1].id.features.incidentVertex = b2_nullFeature;
-	manifold->points[1].id.features.referenceEdge = 0;
-	manifold->points[1].id.features.flip = 0;
+	manifold->m_points[1].m_id.key = 0;
+	manifold->m_points[1].m_id.features.incidentEdge = (uint8)exitStartIndex;
+	manifold->m_points[1].m_id.features.incidentVertex = b2_nullFeature;
+	manifold->m_points[1].m_id.features.referenceEdge = 0;
+	manifold->m_points[1].m_id.features.flip = 0;
 
 	if (dirProj2 < 0.0f)
 	{
-		manifold->points[1].localPointA = v1Local;
-		manifold->points[1].localPointB = edge->GetVertex1();
-		float32 ratio = (-dirProj1) / (dirProj2 - dirProj1);
-		if (ratio > 100.0f * B2_FLT_EPSILON && ratio < 1.0f)
-		{
-			manifold->points[1].separation = enterSepN * (1.0f - ratio) + exitSepN * ratio - totalRadius;
-		}
-		else
-		{
-			manifold->points[1].separation = exitSepN - totalRadius;
-		}
+		manifold->m_points[1].localPointA = v1Local;
+		manifold->m_points[1].localPointB = edge->GetVertex1();
 	}
 	else
 	{
-		manifold->points[1].localPointA = vertices[exitStartIndex];
-		manifold->points[1].localPointB = b2MulT(transformB, b2Mul(transformA, vertices[exitStartIndex]));
-		manifold->points[1].separation = exitSepN - totalRadius;
+		manifold->m_points[1].localPointA = vertices[exitStartIndex];
+		manifold->m_points[1].localPointB = b2MulT(transformB, b2Mul(transformA, vertices[exitStartIndex]));
+		manifold->m_points[1].separation = exitSepN - totalRadius;
 	}
 }
+
+#endif

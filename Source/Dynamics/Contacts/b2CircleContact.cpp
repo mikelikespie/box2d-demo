@@ -43,86 +43,16 @@ b2CircleContact::b2CircleContact(b2Fixture* fixtureA, b2Fixture* fixtureB)
 {
 	b2Assert(m_fixtureA->GetType() == b2_circleShape);
 	b2Assert(m_fixtureB->GetType() == b2_circleShape);
-	m_manifold.pointCount = 0;
-	m_manifold.points[0].normalImpulse = 0.0f;
-	m_manifold.points[0].tangentImpulse = 0.0f;
 }
 
-void b2CircleContact::Evaluate(b2ContactListener* listener)
+void b2CircleContact::Evaluate()
 {
 	b2Body* bodyA = m_fixtureA->GetBody();
 	b2Body* bodyB = m_fixtureB->GetBody();
 
-	b2Manifold m0;
-	memcpy(&m0, &m_manifold, sizeof(b2Manifold));
-
 	b2CollideCircles(	&m_manifold,
 						(b2CircleShape*)m_fixtureA->GetShape(), bodyA->GetXForm(),
 						(b2CircleShape*)m_fixtureB->GetShape(), bodyB->GetXForm());
-
-	b2ContactPoint cp;
-	cp.fixtureA = m_fixtureA;
-	cp.fixtureB = m_fixtureB;
-	cp.friction = b2MixFriction(m_fixtureA->GetFriction(), m_fixtureB->GetFriction());
-	cp.restitution = b2MixRestitution(m_fixtureA->GetRestitution(), m_fixtureB->GetRestitution());
-
-	if (m_manifold.pointCount > 0)
-	{
-		m_manifoldCount = 1;
-		b2ManifoldPoint* mp = m_manifold.points + 0;
-
-		if (m0.pointCount == 0)
-		{
-			mp->normalImpulse = 0.0f;
-			mp->tangentImpulse = 0.0f;
-
-			if (listener)
-			{
-				cp.position = bodyA->GetWorldPoint(mp->localPointA);
-				b2Vec2 vA = bodyA->GetLinearVelocityFromLocalPoint(mp->localPointA);
-				b2Vec2 vB = bodyB->GetLinearVelocityFromLocalPoint(mp->localPointB);
-				cp.velocity = vB - vA;
-				cp.normal = m_manifold.normal;
-				cp.separation = mp->separation;
-				cp.id = mp->id;
-				listener->Add(&cp);
-			}
-		}
-		else
-		{
-			b2ManifoldPoint* mp0 = m0.points + 0;
-			mp->normalImpulse = mp0->normalImpulse;
-			mp->tangentImpulse = mp0->tangentImpulse;
-
-			if (listener)
-			{
-				cp.position = bodyA->GetWorldPoint(mp->localPointA);
-				b2Vec2 vA = bodyA->GetLinearVelocityFromLocalPoint(mp->localPointA);
-				b2Vec2 vB = bodyB->GetLinearVelocityFromLocalPoint(mp->localPointB);
-				cp.velocity = vB - vA;
-				cp.normal = m_manifold.normal;
-				cp.separation = mp->separation;
-				cp.id = mp->id;
-				listener->Persist(&cp);
-			}
-		}
-	}
-	else
-	{
-		m_manifoldCount = 0;
-		if (m0.pointCount > 0 && listener)
-		{
-			b2ManifoldPoint* mp0 = m0.points + 0;
-			cp.position = bodyA->GetWorldPoint(mp0->localPointA);
-			b2Vec2 vA = bodyA->GetLinearVelocityFromLocalPoint(mp0->localPointA);
-			b2Vec2 vB = bodyB->GetLinearVelocityFromLocalPoint(mp0->localPointB);
-			cp.velocity = vB - vA;
-			cp.normal = m0.normal;
-			cp.separation = mp0->separation;
-			cp.id = mp0->id;
-			listener->Remove(&cp);
-		}
-	}
 }
 
 float32 b2CircleContact::ComputeTOI(const b2Sweep& sweepA, const b2Sweep& sweepB) const

@@ -29,6 +29,7 @@ class b2Joint;
 class b2Contact;
 struct b2ContactPoint;
 struct b2ContactResult;
+struct b2Manifold;
 
 /// Joints and fixtures are destroyed when their associated
 /// body is destroyed. Implement this listener so that you
@@ -78,7 +79,16 @@ public:
 /// The default contact filter.
 extern b2ContactFilter b2_defaultFilter;
 
-/// Implement this class to get collision results. You can use these results for
+/// Contact impulses for reporting. Impulses are used instead of forces because
+/// sub-step forces may approach infinity for rigid body collisions. These
+/// match up one-to-one with the contact points in b2Manifold.
+struct b2ContactImpulse
+{
+	float32 normalImpulses[b2_maxManifoldPoints];
+	float32 tangentImpulses[b2_maxManifoldPoints];
+};
+
+/// Implement this class to get contact information. You can use these results for
 /// things like sounds and game logic. You can also get contact results by
 /// traversing the contact lists after the time step. However, you might miss
 /// some contacts because continuous physics leads to sub-stepping.
@@ -86,27 +96,45 @@ extern b2ContactFilter b2_defaultFilter;
 /// single time step.
 /// You should strive to make your callbacks efficient because there may be
 /// many callbacks per time step.
-/// @warning The contact separation is the last computed value.
 /// @warning You cannot create/destroy Box2D entities inside these callbacks.
 class b2ContactListener
 {
 public:
 	virtual ~b2ContactListener() {}
 
-	/// Called when a contact point is added. This includes the geometry
-	/// and the forces.
-	virtual void Add(const b2ContactPoint* point) { B2_NOT_USED(point); }
+	/// Called when two fixtures begin to touch.
+	virtual void BeginContact(const b2Contact* contact) { B2_NOT_USED(contact); }
 
-	/// Called when a contact point persists. This includes the geometry
-	/// and the forces.
-	virtual void Persist(const b2ContactPoint* point) { B2_NOT_USED(point); }
+	/// Called when two fixtures cease to touch.
+	virtual void EndContact(const b2Contact* contact) { B2_NOT_USED(contact); }
 
-	/// Called when a contact point is removed. This includes the last
-	/// computed geometry and forces.
-	virtual void Remove(const b2ContactPoint* point) { B2_NOT_USED(point); }
+	/// This is called after a contact is updated. This allows you to inspect a
+	/// contact before it goes to the solver. If you are careful, you can modify the
+	/// contact manifold (e.g. disable contact).
+	/// A copy of the old manifold is provided so that you can detect changes.
+	/// Note: this is called only for awake bodies.
+	/// Note: this is called even when the number of contact points is zero.
+	/// Note: this is not called for sensors.
+	/// Note: if you set the number of contact points to zero, you will not
+	/// get an EndContact callback. However, you may get a BeginContact callback
+	/// the next step.
+	virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+	{
+		B2_NOT_USED(contact);
+		B2_NOT_USED(oldManifold);
+	}
 
-	/// Called after a contact point is solved.
-	virtual void Result(const b2ContactResult* point) { B2_NOT_USED(point); }
+	/// This lets you inspect a contact after the solver is finished. This is useful
+	/// for inspecting impulses.
+	/// Note: the contact manifold does not include time of impact impulses, which can be
+	/// arbitrarily large if the sub-step is small. Hence the impulse is provided explicitly
+	/// in a separate data structure.
+	/// Note: this is only called for contacts that are touching, solid, and awake.
+	virtual void PostSolve(const b2Contact* contact, const b2ContactImpulse* impulse)
+	{
+		B2_NOT_USED(contact);
+		B2_NOT_USED(impulse);
+	}
 };
 
 /// Color for debug drawing. Each value has the range [0,1].

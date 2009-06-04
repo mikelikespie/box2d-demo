@@ -48,58 +48,34 @@ void BoundaryListener::Violation(b2Body* body)
 	}
 }
 
-void ContactListener::Add(const b2ContactPoint* point)
+void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 {
-	if (test->m_pointCount == k_maxContactPoints)
+	const b2Manifold* manifold = contact->GetManifold();
+
+	if (manifold->m_pointCount == 0)
 	{
 		return;
 	}
 
-	ContactPoint* cp = test->m_points + test->m_pointCount;
-	cp->fixtureA = point->fixtureA;
-	cp->fixtureB = point->fixtureB;
-	cp->position = point->position;
-	cp->normal = point->normal;
-	cp->id = point->id;
-	cp->state = e_contactAdded;
+	b2Fixture* fixtureA = contact->GetFixtureA();
+	b2Fixture* fixtureB = contact->GetFixtureB();
 
-	++test->m_pointCount;
-}
+	b2PointState state1[b2_maxManifoldPoints], state2[b2_maxManifoldPoints];
+	b2GetPointStates(state1, state2, oldManifold, manifold);
 
-void ContactListener::Persist(const b2ContactPoint* point)
-{
-	if (test->m_pointCount == k_maxContactPoints)
+	b2WorldManifold worldManifold;
+	contact->GetWorldManifold(&worldManifold);
+
+	for (int32 i = 0; i < manifold->m_pointCount && test->m_pointCount < k_maxContactPoints; ++i)
 	{
-		return;
+		ContactPoint* cp = test->m_points + test->m_pointCount;
+		cp->fixtureA = fixtureA;
+		cp->fixtureB = fixtureB;
+		cp->position = worldManifold.m_points[i];
+		cp->normal = worldManifold.m_normal;
+		cp->state = state2[i];
+		++test->m_pointCount;
 	}
-
-	ContactPoint* cp = test->m_points + test->m_pointCount;
-	cp->fixtureA = point->fixtureA;
-	cp->fixtureB = point->fixtureB;
-	cp->position = point->position;
-	cp->normal = point->normal;
-	cp->id = point->id;
-	cp->state = e_contactPersisted;
-
-	++test->m_pointCount;
-}
-
-void ContactListener::Remove(const b2ContactPoint* point)
-{
-	if (test->m_pointCount == k_maxContactPoints)
-	{
-		return;
-	}
-
-	ContactPoint* cp = test->m_points + test->m_pointCount;
-	cp->fixtureA = point->fixtureA;
-	cp->fixtureB = point->fixtureB;
-	cp->position = point->position;
-	cp->normal = point->normal;
-	cp->id = point->id;
-	cp->state = e_contactRemoved;
-
-	++test->m_pointCount;
 }
 
 Test::Test()
@@ -403,20 +379,15 @@ void Test::Step(Settings* settings)
 		{
 			ContactPoint* point = m_points + i;
 
-			if (point->state == 0)
+			if (point->state == b2_addState)
 			{
 				// Add
 				m_debugDraw.DrawPoint(point->position, 10.0f, b2Color(0.3f, 0.95f, 0.3f));
 			}
-			else if (point->state == 1)
+			else if (point->state == b2_persistState)
 			{
 				// Persist
 				m_debugDraw.DrawPoint(point->position, 5.0f, b2Color(0.3f, 0.3f, 0.95f));
-			}
-			else
-			{
-				// Remove
-				m_debugDraw.DrawPoint(point->position, 10.0f, b2Color(0.95f, 0.3f, 0.3f));
 			}
 
 			if (settings->drawContactNormals == 1)

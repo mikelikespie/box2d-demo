@@ -134,35 +134,9 @@ void b2ContactManager::Destroy(b2Contact* c)
 	b2Body* bodyA = fixtureA->GetBody();
 	b2Body* bodyB = fixtureB->GetBody();
 
-	b2ContactPoint cp;
-	cp.fixtureA = fixtureA;
-	cp.fixtureB = fixtureB;
-	cp.friction = b2MixFriction(fixtureA->GetFriction(), fixtureB->GetFriction());
-	cp.restitution = b2MixRestitution(fixtureA->GetRestitution(), fixtureB->GetRestitution());
-
-	// Inform the user that this contact is ending.
-	int32 manifoldCount = c->GetManifoldCount();
-	if (manifoldCount > 0 && m_world->m_contactListener)
+	if (c->m_manifold.m_pointCount > 0)
 	{
-		b2Manifold* manifolds = c->GetManifolds();
-
-		for (int32 i = 0; i < manifoldCount; ++i)
-		{
-			b2Manifold* manifold = manifolds + i;
-			cp.normal = manifold->normal;
-
-			for (int32 j = 0; j < manifold->pointCount; ++j)
-			{
-				b2ManifoldPoint* mp = manifold->points + j;
-				cp.position = bodyA->GetWorldPoint(mp->localPointA);
-				b2Vec2 v1 = bodyA->GetLinearVelocityFromLocalPoint(mp->localPointA);
-				b2Vec2 v2 = bodyB->GetLinearVelocityFromLocalPoint(mp->localPointB);
-				cp.velocity = v2 - v1;
-				cp.separation = mp->separation;
-				cp.id = mp->id;
-				m_world->m_contactListener->Remove(&cp);
-			}
-		}
+		m_world->m_contactListener->EndContact(c);
 	}
 
 	// Remove from the world.

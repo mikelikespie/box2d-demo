@@ -46,7 +46,7 @@ void b2EdgeShape::Set(const b2Vec2& v1, const b2Vec2& v2)
 
 	m_direction = m_v2 - m_v1;
 	m_length = m_direction.Normalize();
-	m_normal.Set(m_direction.y, -m_direction.x);
+	m_normal = b2Cross(m_direction, 1.0f);
 
 	m_cornerDir1 = m_normal;
 	m_cornerDir2 = -1.0f * m_normal;

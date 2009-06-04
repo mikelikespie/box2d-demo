@@ -205,7 +205,6 @@ void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSl
 		// v2 = (1.0f - c * dt) * v1
 		b->m_linearVelocity *= b2Clamp(1.0f - step.dt * b->m_linearDamping, 0.0f, 1.0f);
 		b->m_angularVelocity *= b2Clamp(1.0f - step.dt * b->m_angularDamping, 0.0f, 1.0f);
-
 	}
 
 	b2ContactSolver contactSolver(step, m_contacts, m_contactCount, m_allocator);
@@ -356,7 +355,8 @@ void b2Island::SolveTOI(b2TimeStep& subStep)
 {
 	b2ContactSolver contactSolver(subStep, m_contacts, m_contactCount, m_allocator);
 
-	// No warm starting needed for TOI contact events.
+	// No warm starting is needed for TOI events because warm
+	// starting impulses were applied in the discrete solver.
 
 	// Warm starting for joints is off for now, but we need to
 	// call this function to compute Jacobians.
@@ -421,6 +421,28 @@ void b2Island::SolveTOI(b2TimeStep& subStep)
 		// Note: shapes are synchronized later.
 	}
 
+#if 0
+	{
+		for (int32 i = 0; i < m_contactCount; ++i)
+		{
+			m_contacts[i]->Update(NULL);
+		}
+		b2ContactSolver contactSolver2(subStep, m_contacts, m_contactCount, m_allocator);
+
+		// Solve position constraints.
+		const float32 k_toiBaumgarte = 0.75f;
+		for (int32 i = 0; i < subStep.positionIterations; ++i)
+		{
+			bool contactsOkay = contactSolver2.SolvePositionConstraints(k_toiBaumgarte);
+
+			if (contactsOkay)
+			{
+				break;
+			}
+		}
+	}
+#else
+
 	// Solve position constraints.
 	const float32 k_toiBaumgarte = 0.75f;
 	for (int32 i = 0; i < subStep.positionIterations; ++i)
@@ -438,11 +460,12 @@ void b2Island::SolveTOI(b2TimeStep& subStep)
 			break;
 		}
 	}
+#endif
 
 	Report(contactSolver.m_constraints);
 }
 
-void b2Island::Report(b2ContactConstraint* constraints)
+void b2Island::Report(const b2ContactConstraint* constraints)
 {
 	if (m_listener == NULL)
 	{
@@ -452,32 +475,16 @@ void b2Island::Report(b2ContactConstraint* constraints)
 	for (int32 i = 0; i < m_contactCount; ++i)
 	{
 		b2Contact* c = m_contacts[i];
-		b2ContactConstraint* cc = constraints + i;
-		b2ContactResult cr;
-		cr.fixtureA = c->GetFixtureA();
-		cr.fixtureB = c->GetFixtureB();
-		b2Body* bodyA = cr.fixtureA->GetBody();
-		int32 manifoldCount = c->GetManifoldCount();
-		b2Manifold* manifolds = c->GetManifolds();
 
-		for (int32 j = 0; j < manifoldCount; ++j)
+		const b2ContactConstraint* cc = constraints + i;
+		
+		b2ContactImpulse impulse;
+		for (int32 j = 0; j < cc->pointCount; ++j)
 		{
-			b2Manifold* manifold = manifolds + j;
-			cr.normal = manifold->normal;
-			for (int32 k = 0; k < manifold->pointCount; ++k)
-			{
-				b2ManifoldPoint* point = manifold->points + k;
-				b2ContactConstraintPoint* ccp = cc->points + k;
-				cr.position = bodyA->GetWorldPoint(point->localPointA);
-
-				// TOI constraint results are not stored, so get
-				// the result from the constraint.
-				cr.normalImpulse = ccp->normalImpulse;
-				cr.tangentImpulse = ccp->tangentImpulse;
-				cr.id = point->id;
-
-				m_listener->Result(&cr);
-			}
+			impulse.normalImpulses[j] = cc->points[j].normalImpulse;
+			impulse.tangentImpulses[j] = cc->points[j].tangentImpulse;
 		}
+
+		m_listener->PostSolve(c, &impulse);
 	}
 }

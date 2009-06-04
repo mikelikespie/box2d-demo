@@ -50,24 +50,87 @@ union b2ContactID
 /// A manifold point is a contact point belonging to a contact
 /// manifold. It holds details related to the geometry and dynamics
 /// of the contact points.
-/// The point is stored in local coordinates because CCD
-/// requires sub-stepping in which the separation is stale.
+/// The local point usage depends on the manifold type:
+/// -e_circles: the local center of circleB
+/// -e_faceA: the local center of cirlceB or the clip point of polygonB
+/// -e_faceB: the clip point of polygonA
+/// This structure is stored across time steps, so we keep it small.
+/// Note: the impulses are used for internal caching and may not
+/// provide reliable contact forces, especially for high speed collisions.
 struct b2ManifoldPoint
 {
-	b2Vec2 localPointA;		///< local position of the contact point in bodyA
-	b2Vec2 localPointB;		///< local position of the contact point in bodyB
-	float32 separation;		///< the separation of the shapes along the normal vector
-	float32 normalImpulse;	///< the non-penetration impulse
-	float32 tangentImpulse;	///< the friction impulse
-	b2ContactID id;			///< uniquely identifies a contact point between two shapes
+	b2Vec2 m_localPoint;		///< usage depends on manifold type
+	float32 m_normalImpulse;	///< the non-penetration impulse
+	float32 m_tangentImpulse;	///< the friction impulse
+	b2ContactID m_id;			///< uniquely identifies a contact point between two shapes
 };
 
 /// A manifold for two touching convex shapes.
+/// Box2D supports multiple types of contact:
+/// - clip point versus plane with radius
+/// - point versus point with radius (circles)
+/// The local point usage depends on the manifold type:
+/// -e_circles: the local center of circleA
+/// -e_faceA: the center of faceA
+/// -e_faceB: the center of faceB
+/// Similarly the local normal usage:
+/// -e_circles: not used
+/// -e_faceA: the normal on polygonA
+/// -e_faceB: the normal on polygonB
+/// We store contacts in this way so that position correction can
+/// account for movement, which is critical for continuous physics.
+/// All contact scenarios must be expressed in one of these types.
+/// This structure is stored across time steps, so we keep it small.
 struct b2Manifold
 {
-	b2ManifoldPoint points[b2_maxManifoldPoints];	///< the points of contact
-	b2Vec2 normal;									///< the shared unit normal vector, this points from shapeA to shapeB.
-	int32 pointCount;								///< the number of manifold points
+	enum Type
+	{
+		e_circles,
+		e_faceA,
+		e_faceB
+	};
+
+	b2ManifoldPoint m_points[b2_maxManifoldPoints];	///< the points of contact
+	b2Vec2 m_localPlaneNormal;						///< not use for Type::e_points
+	b2Vec2 m_localPoint;							///< usage depends on manifold type
+	Type m_type;
+	int32 m_pointCount;								///< the number of manifold points
+};
+
+/// This is used to compute the current state of a contact manifold.
+struct b2WorldManifold
+{
+	/// Evaluate the manifold with supplied transforms. This assumes
+	/// modest motion from the original state. This does not change the
+	/// point count, impulses, etc. The radii must come from the shapes
+	/// that generated the manifold.
+	void Initialize(const b2Manifold* manifold,
+					const b2XForm& xfA, float32 radiusA,
+					const b2XForm& xfB, float32 radiusB);
+
+	b2Vec2 m_normal;						///< world vector pointing from A to B
+	b2Vec2 m_points[b2_maxManifoldPoints];	///< world contact point (point of intersection)
+};
+
+/// This is used for determining the state of contact points.
+enum b2PointState
+{
+	b2_nullState,		///< point does not exist
+	b2_addState,		///< point was added in the update
+	b2_persistState,	///< point persisted across the update
+	b2_removeState		///< point was removed in the update
+};
+
+/// Compute the point states given two manifolds. The states pertain to the transition from manifold1
+/// to manifold2. So state1 is either persist or remove while state2 is either add or persist.
+void b2GetPointStates(b2PointState state1[b2_maxManifoldPoints], b2PointState state2[b2_maxManifoldPoints],
+					  const b2Manifold* manifold1, const b2Manifold* manifold2);
+
+/// Used for computing contact manifolds.
+struct b2ClipVertex
+{
+	b2Vec2 v;
+	b2ContactID id;
 };
 
 /// Ray-cast input data.
@@ -161,6 +224,10 @@ void b2CollideEdgeAndCircle(b2Manifold* manifold,
 void b2CollidePolyAndEdge(b2Manifold* manifold,
 						  const b2PolygonShape* poly, const b2XForm& xf1,
 						  const b2EdgeShape* edge, const b2XForm& xf2);
+
+/// Clipping for contact manifolds.
+int32 b2ClipSegmentToLine(b2ClipVertex vOut[2], const b2ClipVertex vIn[2],
+							const b2Vec2& normal, float32 offset);
 
 
 // ---------------- Inline Functions ------------------------------------------

@@ -16,12 +16,13 @@
 * 3. This notice may not be removed or altered from any source distribution.
 */
 
-#ifndef CONTACT_H
-#define CONTACT_H
+#ifndef B2_CONTACT_H
+#define B2_CONTACT_H
 
 #include "../../Common/b2Math.h"
 #include "../../Collision/b2Collision.h"
 #include "../../Collision/Shapes/b2Shape.h"
+#include "../b2Fixture.h"
 
 class b2Body;
 class b2Contact;
@@ -54,32 +55,6 @@ struct b2ContactEdge
 	b2ContactEdge* next;	///< the next contact edge in the body's contact list
 };
 
-/// This structure is used to report contact points.
-struct b2ContactPoint
-{
-	b2Fixture* fixtureA;		///< the first shape
-	b2Fixture* fixtureB;		///< the second shape
-	b2Vec2 position;		///< position in world coordinates
-	b2Vec2 velocity;		///< velocity of point on body2 relative to point on body1 (pre-solver)
-	b2Vec2 normal;			///< points from shape1 to shape2
-	float32 separation;		///< the separation is negative when shapes are touching
-	float32 friction;		///< the combined friction coefficient
-	float32 restitution;	///< the combined restitution coefficient
-	b2ContactID id;			///< the contact id identifies the features in contact
-};
-
-/// This structure is used to report contact point results.
-struct b2ContactResult
-{
-	b2Fixture* fixtureA;		///< the first shape
-	b2Fixture* fixtureB;		///< the second shape
-	b2Vec2 position;		///< position in world coordinates
-	b2Vec2 normal;			///< points from shape1 to shape2
-	float32 normalImpulse;	///< the normal impulse applied to body2
-	float32 tangentImpulse;	///< the tangent impulse applied to body2
-	b2ContactID id;			///< the contact id identifies the features in contact
-};
-
 /// The class manages contact between two shapes. A contact exists for each overlapping
 /// AABB in the broad-phase (except if filtered). Therefore a contact object may exist
 /// that has no contact points.
@@ -87,17 +62,18 @@ class b2Contact
 {
 public:
 
-	/// Get the manifold array.
-	virtual b2Manifold* GetManifolds() = 0;
+	/// Get the contact manifold.
+	b2Manifold* GetManifold();
 
-	/// Get the number of manifolds. This is 0 or 1 between convex shapes.
-	/// This may be greater than 1 for convex-vs-concave shapes. Each
-	/// manifold holds up to two contact points with a shared contact normal.
-	int32 GetManifoldCount() const;
+	/// Get the world manifold.
+	void GetWorldManifold(b2WorldManifold* worldManifold) const;
 
 	/// Is this contact solid?
 	/// @return true if this contact should generate a response.
 	bool IsSolid() const;
+
+	/// Are fixtures touching?
+	bool AreTouching() const;
 
 	/// Get the next contact in the world's contact list.
 	b2Contact* GetNext();
@@ -118,6 +94,7 @@ public:
 		e_slowFlag		= 0x0002,
 		e_islandFlag	= 0x0004,
 		e_toiFlag		= 0x0008,
+		e_touchFlag		= 0x0010,
 	};
 
 	static void AddType(b2ContactCreateFcn* createFcn, b2ContactDestroyFcn* destroyFcn,
@@ -131,7 +108,7 @@ public:
 	virtual ~b2Contact() {}
 
 	void Update(b2ContactListener* listener);
-	virtual void Evaluate(b2ContactListener* listener) = 0;
+	virtual void Evaluate() = 0;
 
 	virtual float32 ComputeTOI(const b2Sweep& sweepA, const b2Sweep& sweepB) const = 0;
 
@@ -139,7 +116,6 @@ public:
 	static bool s_initialized;
 
 	uint32 m_flags;
-	int32 m_manifoldCount;
 
 	// World pool and list pointers.
 	b2Contact* m_prev;
@@ -152,17 +128,34 @@ public:
 	b2Fixture* m_fixtureA;
 	b2Fixture* m_fixtureB;
 
+	b2Manifold m_manifold;
+
 	float32 m_toi;
 };
 
-inline int32 b2Contact::GetManifoldCount() const
+inline b2Manifold* b2Contact::GetManifold()
 {
-	return m_manifoldCount;
+	return &m_manifold;
+}
+
+inline void b2Contact::GetWorldManifold(b2WorldManifold* worldManifold) const
+{
+	const b2Body* bodyA = m_fixtureA->GetBody();
+	const b2Body* bodyB = m_fixtureB->GetBody();
+	const b2Shape* shapeA = m_fixtureA->GetShape();
+	const b2Shape* shapeB = m_fixtureB->GetShape();
+
+	worldManifold->Initialize(&m_manifold, bodyA->GetXForm(), shapeA->m_radius, bodyB->GetXForm(), shapeB->m_radius);
 }
 
 inline bool b2Contact::IsSolid() const
 {
 	return (m_flags & e_nonSolidFlag) == 0;
+}
+
+inline bool b2Contact::AreTouching() const
+{
+	return (m_flags & e_touchFlag) == e_touchFlag;
 }
 
 inline b2Contact* b2Contact::GetNext()

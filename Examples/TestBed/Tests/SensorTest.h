@@ -84,11 +84,6 @@ public:
 		{
 			ContactPoint* point = m_points + i;
 
-			if (point->state == 2)
-			{
-				continue;
-			}
-
 			b2Fixture* fixture1 = point->fixtureA;
 			b2Fixture* fixture2 = point->fixtureB;
 			b2Body* other;

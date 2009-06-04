@@ -43,120 +43,16 @@ b2PolygonContact::b2PolygonContact(b2Fixture* fixtureA, b2Fixture* fixtureB)
 {
 	b2Assert(m_fixtureA->GetType() == b2_polygonShape);
 	b2Assert(m_fixtureB->GetType() == b2_polygonShape);
-	m_manifold.pointCount = 0;
 }
 
-void b2PolygonContact::Evaluate(b2ContactListener* listener)
+void b2PolygonContact::Evaluate()
 {
 	b2Body* bodyA = m_fixtureA->GetBody();
 	b2Body* bodyB = m_fixtureB->GetBody();
 
-	b2Manifold m0;
-	memcpy(&m0, &m_manifold, sizeof(b2Manifold));
-
 	b2CollidePolygons(	&m_manifold,
 						(b2PolygonShape*)m_fixtureA->GetShape(), bodyA->GetXForm(),
 						(b2PolygonShape*)m_fixtureB->GetShape(), bodyB->GetXForm());
-
-	bool persisted[b2_maxManifoldPoints] = {false, false};
-
-	b2ContactPoint cp;
-	cp.fixtureA = m_fixtureA;
-	cp.fixtureB = m_fixtureB;
-	cp.friction = b2MixFriction(m_fixtureA->GetFriction(), m_fixtureB->GetFriction());
-	cp.restitution = b2MixRestitution(m_fixtureA->GetRestitution(), m_fixtureB->GetRestitution());
-
-	// Match contact ids to facilitate warm starting.
-	if (m_manifold.pointCount > 0)
-	{
-		// Match old contact ids to new contact ids and copy the
-		// stored impulses to warm start the solver.
-		for (int32 i = 0; i < m_manifold.pointCount; ++i)
-		{
-			b2ManifoldPoint* mp = m_manifold.points + i;
-			mp->normalImpulse = 0.0f;
-			mp->tangentImpulse = 0.0f;
-			bool found = false;
-			b2ContactID id = mp->id;
-
-			for (int32 j = 0; j < m0.pointCount; ++j)
-			{
-				if (persisted[j] == true)
-				{
-					continue;
-				}
-
-				b2ManifoldPoint* mp0 = m0.points + j;
-
-				if (mp0->id.key == id.key)
-				{
-					persisted[j] = true;
-					mp->normalImpulse = mp0->normalImpulse;
-					mp->tangentImpulse = mp0->tangentImpulse;
-
-					// A persistent point.
-					found = true;
-
-					// Report persistent point.
-					if (listener != NULL)
-					{
-						cp.position = bodyA->GetWorldPoint(mp->localPointA);
-						b2Vec2 vA = bodyA->GetLinearVelocityFromLocalPoint(mp->localPointA);
-						b2Vec2 vB = bodyB->GetLinearVelocityFromLocalPoint(mp->localPointB);
-						cp.velocity = vB - vA;
-						cp.normal = m_manifold.normal;
-						cp.separation = mp->separation;
-						cp.id = id;
-						listener->Persist(&cp);
-					}
-					break;
-				}
-			}
-
-			// Report added point.
-			if (found == false && listener != NULL)
-			{
-				cp.position = bodyA->GetWorldPoint(mp->localPointA);
-				b2Vec2 vA = bodyA->GetLinearVelocityFromLocalPoint(mp->localPointA);
-				b2Vec2 vB = bodyB->GetLinearVelocityFromLocalPoint(mp->localPointB);
-				cp.velocity = vB - vA;
-				cp.normal = m_manifold.normal;
-				cp.separation = mp->separation;
-				cp.id = id;
-				listener->Add(&cp);
-			}
-		}
-
-		m_manifoldCount = 1;
-	}
-	else
-	{
-		m_manifoldCount = 0;
-	}
-
-	if (listener == NULL)
-	{
-		return;
-	}
-
-	// Report removed points.
-	for (int32 i = 0; i < m0.pointCount; ++i)
-	{
-		if (persisted[i])
-		{
-			continue;
-		}
-
-		b2ManifoldPoint* mp0 = m0.points + i;
-		cp.position = bodyA->GetWorldPoint(mp0->localPointA);
-		b2Vec2 vA = bodyA->GetLinearVelocityFromLocalPoint(mp0->localPointA);
-		b2Vec2 vB = bodyB->GetLinearVelocityFromLocalPoint(mp0->localPointB);
-		cp.velocity = vB - vA;
-		cp.normal = m0.normal;
-		cp.separation = mp0->separation;
-		cp.id = mp0->id;
-		listener->Remove(&cp);
-	}
 }
 
 float32 b2PolygonContact::ComputeTOI(const b2Sweep& sweepA, const b2Sweep& sweepB) const

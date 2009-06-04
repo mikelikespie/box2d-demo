@@ -51,9 +51,13 @@ public:
 	{
 		B2_NOT_USED(settings);
 
-		b2CollidePolygons(&m_manifold, &m_polygonA, m_transformA, &m_polygonB, m_transformB);
+		b2Manifold manifold;
+		b2CollidePolygons(&manifold, &m_polygonA, m_transformA, &m_polygonB, m_transformB);
 
-		m_debugDraw.DrawString(5, m_textLine, "point count = %d", m_manifold.pointCount);
+		b2WorldManifold worldManifold;
+		worldManifold.Initialize(&manifold, m_transformA, m_polygonA.m_radius, m_transformB, m_polygonB.m_radius);
+
+		m_debugDraw.DrawString(5, m_textLine, "point count = %d", manifold.m_pointCount);
 		m_textLine += 15;
 
 		{
@@ -72,13 +76,9 @@ public:
 			m_debugDraw.DrawPolygon(v, m_polygonB.m_vertexCount, color);
 		}
 
-		for (int32 i = 0; i < m_manifold.pointCount; ++i)
+		for (int32 i = 0; i < manifold.m_pointCount; ++i)
 		{
-			m_debugDraw.DrawString(5, m_textLine, "separation %d = %g", i, m_manifold.points[i].separation);
-			m_textLine += 15;
-
-			b2Vec2 point = b2Mul(m_transformA, m_manifold.points[i].localPointA);
-			m_debugDraw.DrawPoint(point, 4.0f, b2Color(0.9f, 0.3f, 0.3f));
+			m_debugDraw.DrawPoint(worldManifold.m_points[i], 4.0f, b2Color(0.9f, 0.3f, 0.3f));
 		}
 	}
 
@@ -113,8 +113,6 @@ public:
 
 		m_transformB.Set(m_positionB, m_angleB);
 	}
-
-	b2Manifold m_manifold;
 
 	b2PolygonShape m_polygonA;
 	b2PolygonShape m_polygonB;

@@ -35,16 +35,9 @@ public:
 	b2EdgeAndCircleContact(b2Fixture* fixtureA, b2Fixture* fixtureB);
 	~b2EdgeAndCircleContact() {}
 
-	void Evaluate(b2ContactListener* listener);
-
-	b2Manifold* GetManifolds()
-	{
-		return &m_manifold;
-	}
+	void Evaluate();
 
 	float32 ComputeTOI(const b2Sweep& sweepA, const b2Sweep& sweepB) const;
-
-	b2Manifold m_manifold;
 };
 
 #endif

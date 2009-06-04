@@ -127,18 +127,9 @@ const int32 k_maxContactPoints = 2048;
 class ContactListener : public b2ContactListener
 {
 public:
-	void Add(const b2ContactPoint* point);
-	void Persist(const b2ContactPoint* point);
-	void Remove(const b2ContactPoint* point);
+	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
 
 	Test* test;
-};
-
-enum ContactState
-{
-	e_contactAdded,
-	e_contactPersisted,
-	e_contactRemoved,
 };
 
 struct ContactPoint
@@ -147,9 +138,7 @@ struct ContactPoint
 	b2Fixture* fixtureB;
 	b2Vec2 normal;
 	b2Vec2 position;
-	b2Vec2 velocity;
-	b2ContactID id;
-	ContactState state;
+	b2PointState state;
 };
 
 class Test

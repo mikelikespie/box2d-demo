@@ -19,46 +19,6 @@
 #include "b2Collision.h"
 #include "Shapes/b2PolygonShape.h"
 
-struct ClipVertex
-{
-	b2Vec2 v;
-	b2ContactID id;
-};
-
-static int32 b2ClipSegmentToLine(ClipVertex vOut[2], ClipVertex vIn[2],
-					  const b2Vec2& normal, float32 offset)
-{
-	// Start with no output points
-	int32 numOut = 0;
-
-	// Calculate the distance of end points to the line
-	float32 distance0 = b2Dot(normal, vIn[0].v) - offset;
-	float32 distance1 = b2Dot(normal, vIn[1].v) - offset;
-
-	// If the points are behind the plane
-	if (distance0 <= 0.0f) vOut[numOut++] = vIn[0];
-	if (distance1 <= 0.0f) vOut[numOut++] = vIn[1];
-
-	// If the points are on different sides of the plane
-	if (distance0 * distance1 < 0.0f)
-	{
-		// Find intersection point of edge and plane
-		float32 interp = distance0 / (distance0 - distance1);
-		vOut[numOut].v = vIn[0].v + interp * (vIn[1].v - vIn[0].v);
-		if (distance0 > 0.0f)
-		{
-			vOut[numOut].id = vIn[0].id;
-		}
-		else
-		{
-			vOut[numOut].id = vIn[1].id;
-		}
-		++numOut;
-	}
-
-	return numOut;
-}
-
 // Find the separation between poly1 and poly2 for a give edge normal on poly1.
 static float32 b2EdgeSeparation(const b2PolygonShape* poly1, const b2XForm& xf1, int32 edge1,
 							  const b2PolygonShape* poly2, const b2XForm& xf2)
@@ -179,7 +139,7 @@ static float32 b2FindMaxSeparation(int32* edgeIndex,
 	return bestSeparation;
 }
 
-static void b2FindIncidentEdge(ClipVertex c[2],
+static void b2FindIncidentEdge(b2ClipVertex c[2],
 							 const b2PolygonShape* poly1, const b2XForm& xf1, int32 edge1,
 							 const b2PolygonShape* poly2, const b2XForm& xf2)
 {
@@ -234,7 +194,7 @@ void b2CollidePolygons(b2Manifold* manifold,
 					  const b2PolygonShape* polyA, const b2XForm& xfA,
 					  const b2PolygonShape* polyB, const b2XForm& xfB)
 {
-	manifold->pointCount = 0;
+	manifold->m_pointCount = 0;
 	float32 totalRadius = polyA->m_radius + polyB->m_radius;
 
 	int32 edgeA = 0;
@@ -262,6 +222,7 @@ void b2CollidePolygons(b2Manifold* manifold,
 		xf1 = xfB;
 		xf2 = xfA;
 		edge1 = edgeB;
+		manifold->m_type = b2Manifold::e_faceB;
 		flip = 1;
 	}
 	else
@@ -271,10 +232,11 @@ void b2CollidePolygons(b2Manifold* manifold,
 		xf1 = xfA;
 		xf2 = xfB;
 		edge1 = edgeA;
+		manifold->m_type = b2Manifold::e_faceA;
 		flip = 0;
 	}
 
-	ClipVertex incidentEdge[2];
+	b2ClipVertex incidentEdge[2];
 	b2FindIncidentEdge(incidentEdge, poly1, xf1, edge1, poly2, xf2);
 
 	int32 count1 = poly1->m_vertexCount;
@@ -284,6 +246,11 @@ void b2CollidePolygons(b2Manifold* manifold,
 	b2Vec2 v12 = edge1 + 1 < count1 ? vertices1[edge1+1] : vertices1[0];
 
 	b2Vec2 dv = v12 - v11;
+
+	b2Vec2 localNormal = b2Cross(dv, 1.0f);
+	localNormal.Normalize();
+	b2Vec2 planePoint = 0.5f * (v11 + v12);
+
 	b2Vec2 sideNormal = b2Mul(xf1.R, v12 - v11);
 	sideNormal.Normalize();
 	b2Vec2 frontNormal = b2Cross(sideNormal, 1.0f);
@@ -296,8 +263,8 @@ void b2CollidePolygons(b2Manifold* manifold,
 	float32 sideOffset2 = b2Dot(sideNormal, v12);
 
 	// Clip incident edge against extruded edge1 side edges.
-	ClipVertex clipPoints1[2];
-	ClipVertex clipPoints2[2];
+	b2ClipVertex clipPoints1[2];
+	b2ClipVertex clipPoints2[2];
 	int np;
 
 	// Clip to box side 1
@@ -315,7 +282,8 @@ void b2CollidePolygons(b2Manifold* manifold,
 	}
 
 	// Now clipPoints2 contains the clipped points.
-	manifold->normal = flip ? -frontNormal : frontNormal;
+	manifold->m_localPlaneNormal = localNormal;
+	manifold->m_localPoint = planePoint;
 
 	int32 pointCount = 0;
 	for (int32 i = 0; i < b2_maxManifoldPoints; ++i)
@@ -324,15 +292,13 @@ void b2CollidePolygons(b2Manifold* manifold,
 
 		if (separation <= totalRadius)
 		{
-			b2ManifoldPoint* cp = manifold->points + pointCount;
-			cp->separation = separation - totalRadius;
-			cp->localPointA = b2MulT(xfA, clipPoints2[i].v);
-			cp->localPointB = b2MulT(xfB, clipPoints2[i].v);
-			cp->id = clipPoints2[i].id;
-			cp->id.features.flip = flip;
+			b2ManifoldPoint* cp = manifold->m_points + pointCount;
+			cp->m_localPoint = b2MulT(xf2, clipPoints2[i].v);
+			cp->m_id = clipPoints2[i].id;
+			cp->m_id.features.flip = flip;
 			++pointCount;
 		}
 	}
 
-	manifold->pointCount = pointCount;
+	manifold->m_pointCount = pointCount;
 }

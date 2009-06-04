@@ -44,6 +44,9 @@ public:
 	/// @param angle the rotation of the box in local coordinates.
 	void SetAsBox(float32 hx, float32 hy, const b2Vec2& center, float32 angle);
 
+	/// Set this as a single edge.
+	void SetAsEdge(const b2Vec2& v1, const b2Vec2& v2);
+
 	/// @see b2Shape::TestPoint
 	bool TestPoint(const b2XForm& transform, const b2Vec2& p) const;
 

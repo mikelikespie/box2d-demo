@@ -26,8 +26,7 @@ class b2NullContact : public b2Contact
 {
 public:
 	b2NullContact() {}
-	void Evaluate(b2ContactListener*) {}
-	b2Manifold* GetManifolds() { return NULL; }
+	void Evaluate() {}
 	float32 ComputeTOI(const b2Sweep& sweepA, const b2Sweep& sweepB) const
 	{
 		B2_NOT_USED(sweepA);
