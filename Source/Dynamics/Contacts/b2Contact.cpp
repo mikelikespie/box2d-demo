@@ -191,6 +191,11 @@ void b2Contact::Update(b2ContactListener* listener)
 		}
 	}
 
+	if (listener == NULL)
+	{
+		return;
+	}
+
 	if (oldCount == 0 && newCount > 0)
 	{
 		m_flags |= e_touchFlag;
