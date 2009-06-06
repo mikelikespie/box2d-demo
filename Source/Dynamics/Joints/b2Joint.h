@@ -130,7 +130,7 @@ public:
 	b2Joint* GetNext();
 
 	/// Get the user data pointer.
-	void* GetUserData();
+	void* GetUserData() const;
 
 	/// Set the user data pointer.
 	void SetUserData(void* data);
@@ -211,7 +211,7 @@ inline b2Joint* b2Joint::GetNext()
 	return m_next;
 }
 
-inline void* b2Joint::GetUserData()
+inline void* b2Joint::GetUserData() const
 {
 	return m_userData;
 }

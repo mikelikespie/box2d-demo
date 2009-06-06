@@ -310,6 +310,9 @@ public:
 	/// Get the list of all fixtures attached to this body.
 	b2Fixture* GetFixtureList();
 
+	/// Get the list of all fixtures attached to this body.
+	const b2Fixture* GetFixtureList() const;
+
 	/// Get the list of all joints attached to this body.
 	b2JointEdge* GetJointList();
 
@@ -319,8 +322,11 @@ public:
 	/// Get the next body in the world's body list.
 	b2Body* GetNext();
 
+	/// Get the next body in the world's body list.
+	const b2Body* GetNext() const;
+
 	/// Get the user data pointer that was provided in the body definition.
-	void* GetUserData();
+	void* GetUserData() const;
 
 	/// Set the user data. Use this to store your application specific data.
 	void SetUserData(void* data);
@@ -645,6 +651,11 @@ inline b2Fixture* b2Body::GetFixtureList()
 	return m_fixtureList;
 }
 
+inline const b2Fixture* b2Body::GetFixtureList() const
+{
+	return m_fixtureList;
+}
+
 inline b2JointEdge* b2Body::GetJointList()
 {
 	return m_jointList;
@@ -660,7 +671,12 @@ inline b2Body* b2Body::GetNext()
 	return m_next;
 }
 
-inline void* b2Body::GetUserData()
+inline const b2Body* b2Body::GetNext() const
+{
+	return m_next;
+}
+
+inline void* b2Body::GetUserData() const
 {
 	return m_userData;
 }
