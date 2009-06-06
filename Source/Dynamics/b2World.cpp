@@ -325,7 +325,7 @@ void b2World::DestroyJoint(b2Joint* j)
 	}
 }
 
-b2Controller* b2World::CreateController(b2ControllerDef* def)
+b2Controller* b2World::CreateController( const b2ControllerDef* def)
 {
 	b2Controller* controller = def->Create(&m_blockAllocator);
 

@@ -96,7 +96,7 @@ public:
 	}
 
 private:
-	b2BuoyancyController* Create(b2BlockAllocator* allocator);
+	b2BuoyancyController* Create(b2BlockAllocator* allocator) const;
 };
 
 #endif

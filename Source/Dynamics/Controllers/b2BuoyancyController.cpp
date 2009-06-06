@@ -112,7 +112,7 @@ void b2BuoyancyController::Destroy(b2BlockAllocator* allocator)
 	allocator->Free(this, sizeof(b2BuoyancyController));
 }
 
-b2BuoyancyController* b2BuoyancyControllerDef::Create(b2BlockAllocator* allocator)
+b2BuoyancyController* b2BuoyancyControllerDef::Create(b2BlockAllocator* allocator) const
 {
 	void* mem = allocator->Allocate(sizeof(b2BuoyancyController));
 	return new (mem) b2BuoyancyController(this);

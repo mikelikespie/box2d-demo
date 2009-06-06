@@ -100,7 +100,7 @@ public:
 	void DestroyJoint(b2Joint* joint);
 
 	/// Add a controller to the world.
-	b2Controller* CreateController(b2ControllerDef* def);
+	b2Controller* CreateController( const b2ControllerDef* def);
 
 	/// Removes a controller from the world.
 	void DestroyController(b2Controller* controller);
