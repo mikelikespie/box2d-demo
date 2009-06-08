@@ -67,6 +67,7 @@
 
 TestEntry g_testEntries[] =
 {
+	{"Sensor Test", SensorTest::Create},
 	{"CCD Test", CCDTest::Create},
 	{"SphereStack", SphereStack::Create},
 	{"Vertical Stack", VerticalStack::Create},
@@ -82,7 +83,6 @@ TestEntry g_testEntries[] =
 	{"Prismatic", Prismatic::Create},
 	{"Revolute", Revolute::Create},
 	{"Bridge", Bridge::Create},
-	{"Sensor Test", SensorTest::Create},
 	{"Breakable Body", BreakableBody::Create},
 	{"Polygon Shapes", PolyShapes::Create},
 	{"Theo Jansen's Walker", TheoJansen::Create},

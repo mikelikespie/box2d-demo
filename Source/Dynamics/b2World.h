@@ -161,6 +161,12 @@ public:
 	/// @return the head of the world joint list.
 	b2Joint* GetJointList();
 
+	/// Get the world contact list. With the returned contact, use b2Contact::GetNext to get
+	/// the next contact in the world list. A NULL contact indicates the end of the list.
+	/// @return the head of the world contact list.
+	/// @warning contacts are 
+	b2Contact* GetContactList();
+
 	/// Get the world controller list. With the returned controller, use b2Controller::GetNext to get
 	/// the next controller in the world list. A NULL controller indicates the end of the list.
 	/// @return the head of the world controller list.
@@ -278,6 +284,11 @@ inline b2Body* b2World::GetBodyList()
 inline b2Joint* b2World::GetJointList()
 {
 	return m_jointList;
+}
+
+inline b2Contact* b2World::GetContactList()
+{
+	return m_contactList;
 }
 
 inline b2Controller* b2World::GetControllerList()

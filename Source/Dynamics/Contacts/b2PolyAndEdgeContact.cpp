@@ -25,7 +25,7 @@
 #include "../../Collision/b2TimeOfImpact.h"
 #include "../../Common/b2BlockAllocator.h"
 
-#include <new.h>
+#include <new>
 #include <string.h>
 
 b2Contact* b2PolyAndEdgeContact::Create(b2Fixture* fixtureA, b2Fixture* fixtureB, b2BlockAllocator* allocator)

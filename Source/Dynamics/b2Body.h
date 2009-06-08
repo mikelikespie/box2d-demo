@@ -316,6 +316,11 @@ public:
 	/// Get the list of all joints attached to this body.
 	b2JointEdge* GetJointList();
 
+	/// Get the list of all contacts attached to this body.
+	/// @warning this list changes during the time step and you may
+	/// miss some collisions if you don't use b2ContactListener.
+	b2ContactEdge* GetConactList();
+
 	/// Get the list of all controllers attached to this body.
 	b2ControllerEdge* GetControllerList();
 
@@ -659,6 +664,11 @@ inline const b2Fixture* b2Body::GetFixtureList() const
 inline b2JointEdge* b2Body::GetJointList()
 {
 	return m_jointList;
+}
+
+inline 	b2ContactEdge* b2Body::GetConactList()
+{
+	return m_contactList;
 }
 
 inline b2ControllerEdge* b2Body::GetControllerList()

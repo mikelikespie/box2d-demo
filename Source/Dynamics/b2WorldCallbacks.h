@@ -103,10 +103,10 @@ public:
 	virtual ~b2ContactListener() {}
 
 	/// Called when two fixtures begin to touch.
-	virtual void BeginContact(const b2Contact* contact) { B2_NOT_USED(contact); }
+	virtual void BeginContact(b2Contact* contact) { B2_NOT_USED(contact); }
 
 	/// Called when two fixtures cease to touch.
-	virtual void EndContact(const b2Contact* contact) { B2_NOT_USED(contact); }
+	virtual void EndContact(b2Contact* contact) { B2_NOT_USED(contact); }
 
 	/// This is called after a contact is updated. This allows you to inspect a
 	/// contact before it goes to the solver. If you are careful, you can modify the

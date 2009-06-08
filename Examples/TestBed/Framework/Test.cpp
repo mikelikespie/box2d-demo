@@ -48,7 +48,39 @@ void BoundaryListener::Violation(b2Body* body)
 	}
 }
 
-void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
+Test::Test()
+{
+	m_worldAABB.lowerBound.Set(-200.0f, -100.0f);
+	m_worldAABB.upperBound.Set(200.0f, 200.0f);
+	b2Vec2 gravity;
+	gravity.Set(0.0f, -10.0f);
+	bool doSleep = false;
+	m_world = new b2World(m_worldAABB, gravity, doSleep);
+	m_bomb = NULL;
+	m_textLine = 30;
+	m_mouseJoint = NULL;
+	m_pointCount = 0;
+
+	m_destructionListener.test = this;
+	m_boundaryListener.test = this;
+	m_world->SetDestructionListener(&m_destructionListener);
+	m_world->SetBoundaryListener(&m_boundaryListener);
+	m_world->SetContactListener(this);
+	m_world->SetDebugDraw(&m_debugDraw);
+	
+	m_bombSpawning = false;
+
+	m_stepCount = 0;
+}
+
+Test::~Test()
+{
+	// By deleting the world, we delete the bomb, mouse joint, etc.
+	delete m_world;
+	m_world = NULL;
+}
+
+void Test::PreSolve(b2Contact* contact, const b2Manifold* oldManifold)
 {
 	const b2Manifold* manifold = contact->GetManifold();
 
@@ -66,49 +98,16 @@ void ContactListener::PreSolve(b2Contact* contact, const b2Manifold* oldManifold
 	b2WorldManifold worldManifold;
 	contact->GetWorldManifold(&worldManifold);
 
-	for (int32 i = 0; i < manifold->m_pointCount && test->m_pointCount < k_maxContactPoints; ++i)
+	for (int32 i = 0; i < manifold->m_pointCount && m_pointCount < k_maxContactPoints; ++i)
 	{
-		ContactPoint* cp = test->m_points + test->m_pointCount;
+		ContactPoint* cp = m_points + m_pointCount;
 		cp->fixtureA = fixtureA;
 		cp->fixtureB = fixtureB;
 		cp->position = worldManifold.m_points[i];
 		cp->normal = worldManifold.m_normal;
 		cp->state = state2[i];
-		++test->m_pointCount;
+		++m_pointCount;
 	}
-}
-
-Test::Test()
-{
-	m_worldAABB.lowerBound.Set(-200.0f, -100.0f);
-	m_worldAABB.upperBound.Set(200.0f, 200.0f);
-	b2Vec2 gravity;
-	gravity.Set(0.0f, -10.0f);
-	bool doSleep = false;
-	m_world = new b2World(m_worldAABB, gravity, doSleep);
-	m_bomb = NULL;
-	m_textLine = 30;
-	m_mouseJoint = NULL;
-	m_pointCount = 0;
-
-	m_destructionListener.test = this;
-	m_boundaryListener.test = this;
-	m_contactListener.test = this;
-	m_world->SetDestructionListener(&m_destructionListener);
-	m_world->SetBoundaryListener(&m_boundaryListener);
-	m_world->SetContactListener(&m_contactListener);
-	m_world->SetDebugDraw(&m_debugDraw);
-	
-	m_bombSpawning = false;
-
-	m_stepCount = 0;
-}
-
-Test::~Test()
-{
-	// By deleting the world, we delete the bomb, mouse joint, etc.
-	delete m_world;
-	m_world = NULL;
 }
 
 void Test::DrawTitle(int x, int y, const char *string)

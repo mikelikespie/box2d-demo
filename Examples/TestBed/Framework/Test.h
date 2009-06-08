@@ -22,6 +22,8 @@
 #include "Box2D.h"
 #include "Render.h"
 
+#include <stdlib.h>
+
 class Test;
 struct Settings;
 
@@ -124,14 +126,6 @@ public:
 
 const int32 k_maxContactPoints = 2048;
 
-class ContactListener : public b2ContactListener
-{
-public:
-	void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
-
-	Test* test;
-};
-
 struct ContactPoint
 {
 	b2Fixture* fixtureA;
@@ -141,7 +135,7 @@ struct ContactPoint
 	b2PointState state;
 };
 
-class Test
+class Test : public b2ContactListener
 {
 public:
 
@@ -166,7 +160,16 @@ public:
 	virtual void JointDestroyed(b2Joint* joint) { B2_NOT_USED(joint); }
 	virtual void BoundaryViolated(b2Body* body) { B2_NOT_USED(body); }
 
-    
+	// Callbacks for derived classes.
+	virtual void BeginContact(b2Contact* contact) { B2_NOT_USED(contact); }
+	virtual void EndContact(b2Contact* contact) { B2_NOT_USED(contact); }
+	virtual void PreSolve(b2Contact* contact, const b2Manifold* oldManifold);
+	virtual void PostSolve(b2Contact* contact, const b2ContactImpulse* impulse)
+	{
+		B2_NOT_USED(contact);
+		B2_NOT_USED(impulse);
+	}
+
 protected:
 	friend class DestructionListener;
 	friend class BoundaryListener;
@@ -177,7 +180,6 @@ protected:
 	int32 m_pointCount;
 	DestructionListener m_destructionListener;
 	BoundaryListener m_boundaryListener;
-	ContactListener m_contactListener;
 	DebugDraw m_debugDraw;
 	int32 m_textLine;
 	b2World* m_world;
