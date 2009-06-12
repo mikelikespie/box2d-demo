@@ -30,12 +30,15 @@
 #include "../Collision/Shapes/b2EdgeShape.h"
 #include <new>
 
+b2ContactFilter b2_defaultFilter;
+b2ContactListener b2_defaultListener;
+
 b2World::b2World(const b2AABB& worldAABB, const b2Vec2& gravity, bool doSleep)
 {
 	m_destructionListener = NULL;
 	m_boundaryListener = NULL;
 	m_contactFilter = &b2_defaultFilter;
-	m_contactListener = NULL;
+	m_contactListener = &b2_defaultListener;
 	m_debugDraw = NULL;
 
 	m_bodyList = NULL;

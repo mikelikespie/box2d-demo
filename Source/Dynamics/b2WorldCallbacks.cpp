@@ -19,8 +19,6 @@
 #include "b2WorldCallbacks.h"
 #include "b2Fixture.h"
 
-b2ContactFilter b2_defaultFilter;
-
 // Return true if contact calculations should be performed between these two shapes.
 // If you implement your own collision filter you may want to build from this implementation.
 bool b2ContactFilter::ShouldCollide(b2Fixture* fixtureA, b2Fixture* fixtureB)
