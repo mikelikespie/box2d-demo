@@ -91,14 +91,66 @@ public:
 		{
 			void* userData = fixtureB->GetBody()->GetUserData();
 			bool* touching = (bool*)userData;
-			*touching = true;
+			if(touching)
+				*touching = true;
 		}
 
 		if (fixtureB == m_sensor)
 		{
 			void* userData = fixtureA->GetBody()->GetUserData();
 			bool* touching = (bool*)userData;
-			*touching = true;
+			if(touching)
+				*touching = true;
+		}
+
+		b2Fixture* fixture = NULL;
+		if(contact->GetFixtureA()->IsSensor())
+		{
+			fixture = contact->GetFixtureB();
+		}
+		else if(contact->GetFixtureB()->IsSensor())
+		{
+			fixture = contact->GetFixtureA();
+		}
+		if(fixture)
+		{
+			b2CircleDef s;
+			s.radius = 0.7f;
+			s.density = 5;
+			b2BodyDef d;
+			b2Body* b;
+			b2MassData md;
+			switch(rand()%8)
+			{
+			case 0:
+			case 1:
+				s.localPosition = b2Vec2(RandomFloat(), RandomFloat());
+				fixture->GetBody()->CreateFixture(&s);
+				break;
+			case 2:
+			case 3:
+				d.position = b2Vec2(RandomFloat() + 1, RandomFloat());
+				b = m_world->CreateBody(&d);
+				b->CreateFixture(&s);
+				b->SetMassFromShapes();
+				break;
+			case 4:
+				md.mass = 0;
+				md.I = 0;
+				md.center = b2Vec2(0.0f,0.0f);
+				fixture->GetBody()->SetMassData(&md);
+				fixture->GetBody()->SetLinearVelocity(b2Vec2(0.0f, 0.0f));
+				fixture->GetBody()->SetAngularVelocity(0.0f);
+				break;
+			case 5:
+				m_world->DestroyBody(fixture->GetBody());
+				break;
+			case 6:
+			case 7:
+				b2Vec2 pos = b2Vec2(RandomFloat()*10,RandomFloat()*10)+fixture->GetBody()->GetPosition();
+				fixture->GetBody()->SetXForm(pos,0.0f);
+				break;
+			}
 		}
 	}
 
@@ -112,14 +164,16 @@ public:
 		{
 			void* userData = fixtureB->GetBody()->GetUserData();
 			bool* touching = (bool*)userData;
-			*touching = false;
+			if(touching)
+				*touching = false;
 		}
 
 		if (fixtureB == m_sensor)
 		{
 			void* userData = fixtureA->GetBody()->GetUserData();
 			bool* touching = (bool*)userData;
-			*touching = false;
+			if(touching)
+				*touching = false;
 		}
 	}
 

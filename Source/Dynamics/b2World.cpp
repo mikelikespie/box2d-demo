@@ -103,12 +103,6 @@ void b2World::SetDebugDraw(b2DebugDraw* debugDraw)
 
 b2Body* b2World::CreateBody(const b2BodyDef* def)
 {
-	b2Assert(m_lock == false);
-	if (m_lock == true)
-	{
-		return NULL;
-	}
-
 	void* mem = m_blockAllocator.Allocate(sizeof(b2Body));
 	b2Body* b = new (mem) b2Body(def, this);
 
@@ -128,11 +122,6 @@ b2Body* b2World::CreateBody(const b2BodyDef* def)
 void b2World::DestroyBody(b2Body* b)
 {
 	b2Assert(m_bodyCount > 0);
-	b2Assert(m_lock == false);
-	if (m_lock == true)
-	{
-		return;
-	}
 
 	// Delete the attached joints.
 	b2JointEdge* jn = b->m_jointList;
@@ -200,8 +189,6 @@ void b2World::DestroyBody(b2Body* b)
 
 b2Joint* b2World::CreateJoint(const b2JointDef* def)
 {
-	b2Assert(m_lock == false);
-
 	b2Joint* j = b2Joint::Create(def, &m_blockAllocator);
 
 	// Connect to the world list.
@@ -245,8 +232,6 @@ b2Joint* b2World::CreateJoint(const b2JointDef* def)
 
 void b2World::DestroyJoint(b2Joint* j)
 {
-	b2Assert(m_lock == false);
-
 	bool collideConnected = j->m_collideConnected;
 
 	// Remove from the doubly linked list.
@@ -374,8 +359,6 @@ void b2World::DestroyController(b2Controller* controller)
 
 void b2World::Refilter(b2Fixture* fixture)
 {
-	b2Assert(m_lock == false);
-
 	fixture->RefilterProxy(m_broadPhase, fixture->GetBody()->GetXForm());
 }
 
@@ -448,7 +431,7 @@ void b2World::Solve(const b2TimeStep& step)
 			{
 				// Has this contact already been added to an island?
 				// Is this contact non-solid (involves a sensor).
-				if (cn->contact->m_flags & (b2Contact::e_islandFlag | b2Contact::e_nonSolidFlag))
+				if (cn->contact->m_flags & (b2Contact::e_islandFlag | b2Contact::e_nonSolidFlag | b2Contact::e_invalidFlag | b2Contact::e_destroyFlag))
 				{
 					continue;
 				}
@@ -587,7 +570,7 @@ void b2World::SolveTOI(const b2TimeStep& step)
 
 		for (b2Contact* c = m_contactList; c; c = c->m_next)
 		{
-			if (c->m_flags & (b2Contact::e_slowFlag | b2Contact::e_nonSolidFlag))
+			if (c->m_flags & (b2Contact::e_slowFlag | b2Contact::e_nonSolidFlag | b2Contact::e_invalidFlag | b2Contact::e_destroyFlag))
 			{
 				continue;
 			}
@@ -670,8 +653,18 @@ void b2World::SolveTOI(const b2TimeStep& step)
 		b2->Advance(minTOI);
 
 		// The TOI contact likely has some new contact points.
-		minContact->Update(m_contactListener);
+		bool destroyed = m_contactManager.Update(minContact);
+		if (destroyed)
+			continue;
+        
 		minContact->m_flags &= ~b2Contact::e_toiFlag;
+        
+		// Check if some flags have changed in the user callback
+		// Any of these mean we should now ignore the collision
+		if (minContact->m_flags & (b2Contact::e_slowFlag | b2Contact::e_nonSolidFlag | b2Contact::e_invalidFlag | b2Contact::e_destroyFlag))
+		{
+			continue;
+		}
 
 		if ((minContact->m_flags & b2Contact::e_touchFlag) == 0)
 		{
@@ -685,6 +678,10 @@ void b2World::SolveTOI(const b2TimeStep& step)
 		if (seed->IsStatic())
 		{
 			seed = b2;
+		}
+		if (seed->IsStatic())
+		{
+			continue;
 		}
 
 		// Reset island and queue.

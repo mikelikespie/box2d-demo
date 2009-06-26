@@ -72,6 +72,18 @@ public:
 	/// @return true if this contact should generate a response.
 	bool IsSolid() const;
 
+    //TODO: Doc
+	void SetSolid(bool solid);
+
+	/// Is this contact invalid?
+	/// Contacts created or modified during a step are invalid,
+	/// and won't participate until the next step.
+	bool IsInvalid() const;
+
+	/// Has this contact been removed from the world
+	/// And is about to be destroyed.
+	bool IsDestroyed() const;
+
 	/// Are fixtures touching?
 	bool AreTouching() const;
 
@@ -83,31 +95,57 @@ public:
 
 	/// Get the second fixture in this contact.
 	b2Fixture* GetFixtureB();
+    
+	/// Disables the collision response. Can be called from within a
+	/// contact-callback.
+	//void DisableCollisionResponses();
+	
+	/// Use these to track information specific to a contact over its lifetime.
+	void* GetUserData();
+	void SetUserData(void* data);
 
 	//--------------- Internals Below -------------------
-public:
+protected:
+	friend class b2ContactManager;
+	friend class b2World;
+	friend class b2ContactSolver;
 
 	// m_flags
 	enum
 	{
+		// This contact should not participate in Solve
+		// The contact equivalent of sensors
 		e_nonSolidFlag	= 0x0001,
+		// Do not use TOI solve.
 		e_slowFlag		= 0x0002,
+		// Used when crawling contact graph when forming islands.
 		e_islandFlag	= 0x0004,
+		// Used in SolveTOI to indicate the cached toi value is still valid.
 		e_toiFlag		= 0x0008,
+        // TODO: Doc
 		e_touchFlag		= 0x0010,
+		// Contacts are invalid if they have been created or modified inside a step
+		// and remain invalid until the next step.
+		e_invalidFlag	= 0x0020,
+		// Marked for deferred destruction.
+		e_destroyFlag	= 0x0040,
+		// This marks if contact is currently being evaluated.
+		// Meaning it should be deferred instead of destroyed.
+		// This is essntially a poor mans recursive lock.
+		e_lockedFlag	= 0x0080,
 	};
 
 	static void AddType(b2ContactCreateFcn* createFcn, b2ContactDestroyFcn* destroyFcn,
 						b2ShapeType typeA, b2ShapeType typeB);
 	static void InitializeRegisters();
 	static b2Contact* Create(b2Fixture* fixtureA, b2Fixture* fixtureB, b2BlockAllocator* allocator);
+    static void Destroy(b2Contact* contact, b2ShapeType typeA, b2ShapeType typeB, b2BlockAllocator* allocator);
 	static void Destroy(b2Contact* contact, b2BlockAllocator* allocator);
 
 	b2Contact() : m_fixtureA(NULL), m_fixtureB(NULL) {}
 	b2Contact(b2Fixture* fixtureA, b2Fixture* fixtureB);
 	virtual ~b2Contact() {}
 
-	void Update(b2ContactListener* listener);
 	virtual void Evaluate() = 0;
 
 	virtual float32 ComputeTOI(const b2Sweep& sweepA, const b2Sweep& sweepB) const = 0;
@@ -131,6 +169,8 @@ public:
 	b2Manifold m_manifold;
 
 	float32 m_toi;
+    
+    void* m_userData;
 };
 
 inline b2Manifold* b2Contact::GetManifold()
@@ -153,6 +193,16 @@ inline bool b2Contact::IsSolid() const
 	return (m_flags & e_nonSolidFlag) == 0;
 }
 
+inline bool b2Contact::IsInvalid() const
+{
+	return (m_flags & e_invalidFlag) != 0;
+}
+
+inline bool b2Contact::IsDestroyed() const
+{
+	return (m_flags & e_destroyFlag) != 0;
+}
+
 inline bool b2Contact::AreTouching() const
 {
 	return (m_flags & e_touchFlag) == e_touchFlag;
@@ -171,6 +221,21 @@ inline b2Fixture* b2Contact::GetFixtureA()
 inline b2Fixture* b2Contact::GetFixtureB()
 {
 	return m_fixtureB;
+}
+
+//inline void b2Contact::DisableCollisionResponses()
+//{
+//	m_flags |= e_nonSolidFlag;
+//}
+
+inline void* b2Contact::GetUserData()
+{
+	return m_userData;
+}
+
+inline void b2Contact::SetUserData(void* data)
+{
+	m_userData = data;
 }
 
 #endif

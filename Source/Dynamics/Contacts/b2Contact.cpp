@@ -95,6 +95,10 @@ b2Contact* b2Contact::Create(b2Fixture* fixtureA, b2Fixture* fixtureB, b2BlockAl
 
 void b2Contact::Destroy(b2Contact* contact, b2BlockAllocator* allocator)
 {
+	Destroy(contact, contact->GetFixtureA()->GetType(), contact->GetFixtureB()->GetType(), allocator);
+}
+void b2Contact::Destroy(b2Contact* contact, b2ShapeType typeA, b2ShapeType typeB, b2BlockAllocator* allocator)
+{
 	b2Assert(s_initialized == true);
 
 	if (contact->m_manifold.m_pointCount > 0)
@@ -102,9 +106,6 @@ void b2Contact::Destroy(b2Contact* contact, b2BlockAllocator* allocator)
 		contact->GetFixtureA()->GetBody()->WakeUp();
 		contact->GetFixtureB()->GetBody()->WakeUp();
 	}
-
-	b2ShapeType typeA = contact->GetFixtureA()->GetType();
-	b2ShapeType typeB = contact->GetFixtureB()->GetType();
 
 	b2Assert(b2_unknownShape < typeA && typeB < b2_shapeTypeCount);
 	b2Assert(b2_unknownShape < typeA && typeB < b2_shapeTypeCount);
@@ -139,78 +140,4 @@ b2Contact::b2Contact(b2Fixture* fA, b2Fixture* fB)
 	m_nodeB.prev = NULL;
 	m_nodeB.next = NULL;
 	m_nodeB.other = NULL;
-}
-
-void b2Contact::Update(b2ContactListener* listener)
-{
-	b2Manifold oldManifold = m_manifold;
-
-	Evaluate();
-
-	b2Body* bodyA = m_fixtureA->GetBody();
-	b2Body* bodyB = m_fixtureB->GetBody();
-
-	int32 oldCount = oldManifold.m_pointCount;
-	int32 newCount = m_manifold.m_pointCount;
-
-	if (newCount == 0 && oldCount > 0)
-	{
-		bodyA->WakeUp();
-		bodyB->WakeUp();
-	}
-
-	// Slow contacts don't generate TOI events.
-	if (bodyA->IsStatic() || bodyA->IsBullet() || bodyB->IsStatic() || bodyB->IsBullet())
-	{
-		m_flags &= ~e_slowFlag;
-	}
-	else
-	{
-		m_flags |= e_slowFlag;
-	}
-
-	// Match old contact ids to new contact ids and copy the
-	// stored impulses to warm start the solver.
-	for (int32 i = 0; i < m_manifold.m_pointCount; ++i)
-	{
-		b2ManifoldPoint* mp2 = m_manifold.m_points + i;
-		mp2->m_normalImpulse = 0.0f;
-		mp2->m_tangentImpulse = 0.0f;
-		b2ContactID id2 = mp2->m_id;
-
-		for (int32 j = 0; j < oldManifold.m_pointCount; ++j)
-		{
-			b2ManifoldPoint* mp1 = oldManifold.m_points + j;
-
-			if (mp1->m_id.key == id2.key)
-			{
-				mp2->m_normalImpulse = mp1->m_normalImpulse;
-				mp2->m_tangentImpulse = mp1->m_tangentImpulse;
-				break;
-			}
-		}
-	}
-
-	if (oldCount == 0 && newCount > 0)
-	{
-		m_flags |= e_touchFlag;
-		listener->BeginContact(this);
-	}
-
-	if (oldCount > 0 && newCount == 0)
-	{
-		m_flags &= ~e_touchFlag;
-		listener->EndContact(this);
-	}
-
-	if ((m_flags & e_nonSolidFlag) == 0)
-	{
-		listener->PreSolve(this, &oldManifold);
-
-		// The user may have disabled contact.
-		if (m_manifold.m_pointCount == 0)
-		{
-			m_flags &= ~e_touchFlag;
-		}
-	}
 }

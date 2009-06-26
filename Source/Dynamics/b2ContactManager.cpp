@@ -187,8 +187,27 @@ void b2ContactManager::Destroy(b2Contact* c)
 		bodyB->m_contactList = c->m_nodeB.next;
 	}
 
+	if (m_nextContact == c)
+	{
+		m_nextContact = c->GetNext();
+	}
 	// Call the factory.
-	b2Contact::Destroy(c, &m_world->m_blockAllocator);
+	if( c->m_flags & b2Contact::e_lockedFlag)
+	{
+		// We cannot destroy the current contact - it's being worked on.
+		// Instead mark it for deferred destruction.
+		// Collide() will handle calling Destroy slightly later
+		c->m_flags |= b2Contact::e_destroyFlag;
+
+		// Also do some cleaning up so that people don't accidentally do stupid things.
+        // TODO: Is this necessary or wise?
+		//c->m_fixtureA = NULL;
+		//c->m_fixtureB = NULL;
+		c->m_next = NULL;
+		c->m_prev = NULL;
+	}else{
+		b2Contact::Destroy(c, &m_world->m_blockAllocator);
+	}
 	--m_world->m_contactCount;
 }
 
@@ -198,8 +217,13 @@ void b2ContactManager::Destroy(b2Contact* c)
 void b2ContactManager::Collide()
 {
 	// Update awake contacts.
-	for (b2Contact* c = m_world->m_contactList; c; c = c->GetNext())
+	// Note the use of a accessible iterator, m_nextContact, this can be updated elsewhere
+	// should that contact get deleted inside the call to m_nextContact
+	m_nextContact = m_world->m_contactList;
+	while(m_nextContact)
 	{
+		b2Contact* c  = m_nextContact;
+		m_nextContact = c->GetNext();
 		b2Body* bodyA = c->GetFixtureA()->GetBody();
 		b2Body* bodyB = c->GetFixtureB()->GetBody();
 		if (bodyA->IsSleeping() && bodyB->IsSleeping())
@@ -207,6 +231,103 @@ void b2ContactManager::Collide()
 			continue;
 		}
 
-		c->Update(m_world->m_contactListener);
+		Update(c);
 	}
+    m_nextContact = NULL;
+}
+
+bool b2ContactManager::Update(b2Contact* contact)
+{
+	b2ContactListener* listener = m_world->m_contactListener;
+    
+	b2Body* bodyA = contact->m_fixtureA->GetBody();
+	b2Body* bodyB = contact->m_fixtureB->GetBody();
+    
+	b2ShapeType shapeAType = contact->m_fixtureA->GetType();
+	b2ShapeType shapeBType = contact->m_fixtureB->GetType();
+    
+    b2Manifold oldManifold = contact->m_manifold;
+    
+	uint32 oldLock = contact->m_flags & b2Contact::e_lockedFlag ;
+
+	contact->m_flags |= b2Contact::e_lockedFlag;
+
+	contact->Evaluate();
+	
+	contact->m_flags &= ~b2Contact::e_invalidFlag;
+
+	if(contact->m_flags & b2Contact::e_destroyFlag)
+	{     
+		b2Contact::Destroy(contact, shapeAType, shapeBType, &m_world->m_blockAllocator);
+        return true;
+	}
+
+	if(!oldLock)
+		contact->m_flags &= ~b2Contact::e_lockedFlag;
+    
+	int32 oldCount = oldManifold.m_pointCount;
+	int32 newCount = contact->m_manifold.m_pointCount;
+    
+	if (newCount == 0 && oldCount > 0)
+	{
+		bodyA->WakeUp();
+		bodyB->WakeUp();
+	}
+
+	// Slow contacts don't generate TOI events.
+	if (bodyA->IsStatic() || bodyA->IsBullet() || bodyB->IsStatic() || bodyB->IsBullet())
+	{
+		contact->m_flags &= ~b2Contact::e_slowFlag;
+	}
+	else
+	{
+		contact->m_flags |= b2Contact::e_slowFlag;
+	}
+    
+	// Match old contact ids to new contact ids and copy the
+	// stored impulses to warm start the solver.
+	for (int32 i = 0; i < contact->m_manifold.m_pointCount; ++i)
+	{
+		b2ManifoldPoint* mp2 = contact->m_manifold.m_points + i;
+		mp2->m_normalImpulse = 0.0f;
+		mp2->m_tangentImpulse = 0.0f;
+		b2ContactID id2 = mp2->m_id;
+
+		for (int32 j = 0; j < oldManifold.m_pointCount; ++j)
+		{
+			b2ManifoldPoint* mp1 = oldManifold.m_points + j;
+
+			if (mp1->m_id.key == id2.key)
+			{
+				mp2->m_normalImpulse = mp1->m_normalImpulse;
+				mp2->m_tangentImpulse = mp1->m_tangentImpulse;
+				break;
+			}
+		}
+	}
+
+	if (oldCount == 0 && newCount > 0)
+	{
+		contact->m_flags |= b2Contact::e_touchFlag;
+		listener->BeginContact(contact);
+	}
+
+	if (oldCount > 0 && newCount == 0)
+	{
+		contact->m_flags &= ~b2Contact::e_touchFlag;
+		listener->EndContact(contact);
+	}
+
+	if ((contact->m_flags & b2Contact::e_nonSolidFlag) == 0)
+	{
+		listener->PreSolve(contact, &oldManifold);
+
+		// The user may have disabled contact.
+		if (contact->m_manifold.m_pointCount == 0)
+		{
+			contact->m_flags &= ~b2Contact::e_touchFlag;
+		}
+	}
+	
+	return false;
 }

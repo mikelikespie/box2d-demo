@@ -24,8 +24,6 @@
 
 b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 {
-	b2Assert(world->m_lock == false);
-
 	m_flags = 0;
 
 	if (bd->isBullet)
@@ -110,18 +108,11 @@ b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 
 b2Body::~b2Body()
 {
-	b2Assert(m_world->m_lock == false);
 	// shapes and joints are destroyed in b2World::Destroy
 }
 
 b2Fixture* b2Body::CreateFixture(const b2FixtureDef* def)
 {
-	b2Assert(m_world->m_lock == false);
-	if (m_world->m_lock == true)
-	{
-		return NULL;
-	}
-
 	b2BlockAllocator* allocator = &m_world->m_blockAllocator;
 	b2BroadPhase* broadPhase = m_world->m_broadPhase;
 
@@ -140,12 +131,6 @@ b2Fixture* b2Body::CreateFixture(const b2FixtureDef* def)
 
 void b2Body::DestroyFixture(b2Fixture* fixture)
 {
-	b2Assert(m_world->m_lock == false);
-	if (m_world->m_lock == true)
-	{
-		return;
-	}
-
 	b2Assert(fixture->m_body == this);
 
 	// Remove the fixture from this body's singly linked list.
@@ -182,12 +167,6 @@ void b2Body::DestroyFixture(b2Fixture* fixture)
 // TODO_ERIN adjust linear velocity and torque to account for movement of center.
 void b2Body::SetMassData(const b2MassData* massData)
 {
-	b2Assert(m_world->m_lock == false);
-	if (m_world->m_lock == true)
-	{
-		return;
-	}
-
 	m_invMass = 0.0f;
 	m_I = 0.0f;
 	m_invI = 0.0f;
@@ -233,12 +212,6 @@ void b2Body::SetMassData(const b2MassData* massData)
 // TODO_ERIN adjust linear velocity and torque to account for movement of center.
 void b2Body::SetMassFromShapes()
 {
-	b2Assert(m_world->m_lock == false);
-	if (m_world->m_lock == true)
-	{
-		return;
-	}
-
 	// Compute mass data from shapes. Each shape has its own density.
 	m_mass = 0.0f;
 	m_invMass = 0.0f;
@@ -333,12 +306,6 @@ bool b2Body::IsConnected(const b2Body* other) const
 
 bool b2Body::SetXForm(const b2Vec2& position, float32 angle)
 {
-	b2Assert(m_world->m_lock == false);
-	if (m_world->m_lock == true)
-	{
-		return true;
-	}
-
 	if (IsFrozen())
 	{
 		return false;
