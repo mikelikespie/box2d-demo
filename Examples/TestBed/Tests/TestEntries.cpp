@@ -63,6 +63,7 @@
 #include "VaryingRestitution.h"
 #include "VerticalStack.h"
 #include "Web.h"
+#include "FixedJoint.h"
 
 
 TestEntry g_testEntries[] =
@@ -85,6 +86,7 @@ TestEntry g_testEntries[] =
 	{"Bridge", Bridge::Create},
 	{"Breakable Body", BreakableBody::Create},
 	{"Polygon Shapes", PolyShapes::Create},
+	{"FixedJoint", FixedJoint::Create},
 	{"Theo Jansen's Walker", TheoJansen::Create},
 	{"Web", Web::Create},
 	{"Varying Friction", VaryingFriction::Create},

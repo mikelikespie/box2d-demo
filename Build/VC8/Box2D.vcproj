@@ -426,6 +426,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\..\Source\Dynamics\Joints\b2FixedJoint.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\..\Source\Dynamics\Joints\b2FixedJoint.h"
+					>
+				</File>
+				<File
 					RelativePath="..\..\Source\Dynamics\Joints\b2GearJoint.cpp"
 					>
 				</File>
