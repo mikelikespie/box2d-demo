@@ -178,6 +178,32 @@ b2Island::~b2Island()
 	m_allocator->Free(m_bodies);
 }
 
+// returns the force that was lost;
+static inline void fricV(b2Vec2 &v, float32 mass, float32 dt, float32 &frictionLeft)
+{
+	if (frictionLeft > 0.0 && dt > 0.0 && v.LengthSquared() > 0.00001)
+	{
+
+		printf("fl %f\n", (double)frictionLeft);
+		b2Vec2 momentum = mass * v;
+		b2Vec2 reverseMomentum = -momentum;
+		b2Vec2 reverseForce = (1.0/dt) * reverseMomentum;
+
+		float32 oldReverseForceLength = reverseForce.Length();
+		float32 newReverseForceLength = b2Clamp(oldReverseForceLength, -frictionLeft, frictionLeft);
+		printf("f %f,%f => ", reverseForce.x, reverseForce.y);
+		reverseForce *= newReverseForceLength/oldReverseForceLength;
+		printf("%f,%f \n", reverseForce.x, reverseForce.y);
+
+		printf("v %f,%f=>", (double)v.x, (double)v.y);
+		v += dt / mass * reverseForce ;
+		printf("%f,%f\n\n", (double)v.x, (double)v.y);
+
+		frictionLeft -= newReverseForceLength;
+		printf(" fl %f\n", (double)frictionLeft);
+
+	}
+}
 void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSleep)
 {
 	// Integrate velocities and apply damping.
@@ -187,6 +213,12 @@ void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSl
 
 		if (b->IsStatic())
 			continue;
+
+		//Reset how much friction we have left;
+		b->m_topFrictionLeft = b->m_topFriction;
+
+		//counteract the force
+		fric(b->m_force, b->m_topFrictionLeft);
 
 		// Integrate velocities.
 		b->m_linearVelocity += step.dt * (gravity + b->m_invMass * b->m_force);
@@ -205,6 +237,8 @@ void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSl
 		// v2 = (1.0f - c * dt) * v1
 		b->m_linearVelocity *= b2Clamp(1.0f - step.dt * b->m_linearDamping, 0.0f, 1.0f);
 		b->m_angularVelocity *= b2Clamp(1.0f - step.dt * b->m_angularDamping, 0.0f, 1.0f);
+
+	//	printf("%f,%f\n", b->m_linearVelocity.x, b->m_linearVelocity.y);
 	}
 
 	b2ContactSolver contactSolver(step, m_contacts, m_contactCount, m_allocator);
@@ -238,6 +272,8 @@ void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSl
 
 		if (b->IsStatic())
 			continue;
+
+		fricV(b->m_linearVelocity, b->m_mass, step.dt, b->m_topFrictionLeft);
 
 		// Check for large velocities.
 		b2Vec2 translation = step.dt * b->m_linearVelocity;

@@ -57,8 +57,10 @@ public:
 			b2BodyDef chassisBd;
 
 			chassisBd.position = b2Vec2(0.0f, 0.0f);
+			chassisBd.topFriction = 5000000.0;
 
 			chassis = world->CreateBody(&chassisBd);
+
 			b2PolygonDef chassisFixture;
 
 			chassisFixture.SetAsBox(halfWidth, halfHeight);
@@ -68,6 +70,8 @@ public:
 
 			chassis->CreateFixture(&chassisFixture);
 			chassis->SetMassFromShapes();
+
+
 		}
 
 		{
@@ -81,13 +85,15 @@ public:
 			wheels[2] = makeWheel(-1, -1, wheelDef);
 			wheels[3] = makeWheel(1, -1, wheelDef);
 
-			b2TensorDampingControllerDef wheelDamperDef;
-			wheelDamperDef.SetAxisAligned(1000000.0, 0.0);
+	//		b2TensorDryFrictionControllerDef wheelDamperDef;
+	//		wheelDamperDef.SetAxisFrictionForce(1000000.0);
 
-			b2TensorDampingController *wheelDamper = (b2TensorDampingController*)world->CreateController(&wheelDamperDef);
+	//		b2TensorDryFrictionController *wheelDamper = (b2TensorDryFrictionController*)world->CreateController(&wheelDamperDef);
 
-			for (int i = 0; i < 4; i++)
-				wheelDamper->AddBody(wheels[i]);
+		//	for (int i = 0; i < 4; i++)
+		//		wheelDamper->AddBody(wheels[i]);
+
+
 
 		}
 
@@ -108,7 +114,7 @@ public:
 
 			rackDef.Initialize(w0, w1, pos0, pos1);
 
-			world->CreateJoint(&rackDef);
+//			world->CreateJoint(&rackDef);
 		}
 	}
 
@@ -159,7 +165,7 @@ private:
 
 		jointDef.enableLimit = true;
 
-		b2RevoluteJoint *joint = (b2RevoluteJoint*)world->CreateJoint(&jointDef);
+		/*	b2RevoluteJoint *joint = (b2RevoluteJoint*)world->CreateJoint(&jointDef);
 
 		if (xmul < 0 && ymul > 0)
 		{
@@ -167,7 +173,7 @@ private:
 			frontLeftJoint->EnableMotor(true);
 			frontLeftJoint->SetMaxMotorTorque(5000.0f);
 		}
-
+*/
 		return wheel;
 	}
 
@@ -186,12 +192,12 @@ public:
 	{
 		Test::Step(settings);
 
-		if (keysDown['a'])
+	/*	if (keysDown['a'])
 			car->Steer(1.0f);
 		else if (keysDown['d'])
 			car->Steer(-1.0f);
 		else
-			car->Steer(0.0f);
+			car->Steer(0.0f);*/
 
 	}
 	void KeyDown(unsigned char key)

@@ -65,8 +65,12 @@ b2Body::b2Body(const b2BodyDef* bd, b2World* world)
 	m_linearDamping = bd->linearDamping;
 	m_angularDamping = bd->angularDamping;
 
+	m_topFriction = bd->topFriction;
+
 	m_force.Set(0.0f, 0.0f);
 	m_torque = 0.0f;
+
+	m_topFrictionLeft = m_topFriction;
 
 	m_linearVelocity.SetZero();
 	m_angularVelocity = 0.0f;

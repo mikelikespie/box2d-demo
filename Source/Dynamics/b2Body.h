@@ -51,6 +51,7 @@ struct b2BodyDef
 		angularVelocity = 0.0f;
 		linearDamping = 0.0f;
 		angularDamping = 0.0f;
+		topFriction = 0.0f;
 		allowSleep = true;
 		isSleeping = false;
 		fixedRotation = false;
@@ -87,6 +88,8 @@ struct b2BodyDef
 	/// can be larger than 1.0f but the damping effect becomes sensitive to the
 	/// time step when the damping parameter is large.
 	float32 angularDamping;
+
+	float32 topFriction;
 
 	/// Set this flag to false if this body should never fall asleep. Note that
 	/// this increases CPU usage.
@@ -420,6 +423,10 @@ private:
 
 	float32 m_linearDamping;
 	float32 m_angularDamping;
+
+	float32 m_topFriction;
+
+	float32 m_topFrictionLeft;
 
 	float32 m_sleepTime;
 
