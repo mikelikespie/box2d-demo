@@ -100,9 +100,19 @@ void SimulationLoop()
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
+
+
 	test->SetTextLine(30);
 	settings.hz = settingsHz;
 	test->Step(&settings);
+
+	for (int key = 0; key < NUM_KEYS; key++)
+	{
+		if (test->keysDown[key])
+		{
+			test->KeyDown(key);
+		}
+	}
 
 	test->DrawTitle(5, 15, entry->name);
 
@@ -119,11 +129,17 @@ void SimulationLoop()
 		Resize(width, height);
 	}
 }
+void KeyboardUp(unsigned char key, int x, int y)
+{
+	test->keysDown[key] = false;
+}
 
 void Keyboard(unsigned char key, int x, int y)
 {
 	B2_NOT_USED(x);
 	B2_NOT_USED(y);
+
+	test->keysDown[key] = true;
 
 	switch (key)
 	{
@@ -343,6 +359,7 @@ int main(int argc, char** argv)
 	glutDisplayFunc(SimulationLoop);
 	GLUI_Master.set_glutReshapeFunc(Resize);  
 	GLUI_Master.set_glutKeyboardFunc(Keyboard);
+	glutKeyboardUpFunc(KeyboardUp);
 	GLUI_Master.set_glutSpecialFunc(KeyboardSpecial);
 	GLUI_Master.set_glutMouseFunc(Mouse);
 #ifdef FREEGLUT

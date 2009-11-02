@@ -135,6 +135,8 @@ struct ContactPoint
 	b2PointState state;
 };
 
+const int32 NUM_KEYS = 256;
+
 class Test : public b2ContactListener
 {
 public:
@@ -146,6 +148,7 @@ public:
     void DrawTitle(int x, int y, const char *string);
 	virtual void Step(Settings* settings);
 	virtual void Keyboard(unsigned char key) { B2_NOT_USED(key); }
+	virtual void KeyDown(unsigned char key) { printf("hello\n"); B2_NOT_USED(key); }
 	void ShiftMouseDown(const b2Vec2& p);
 	virtual void MouseDown(const b2Vec2& p);
 	virtual void MouseUp(const b2Vec2& p);
@@ -170,6 +173,7 @@ public:
 		B2_NOT_USED(impulse);
 	}
 
+	bool keysDown[NUM_KEYS];
 protected:
 	friend class DestructionListener;
 	friend class BoundaryListener;

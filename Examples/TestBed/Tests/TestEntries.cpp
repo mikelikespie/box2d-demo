@@ -39,8 +39,6 @@
 #include "CompoundShapes.h"
 #include "DistanceTest.h"
 #include "Dominos.h"
-#include "DynamicEdges.h"
-#include "DynamicTreeTest.h"
 #include "ElasticBody.h"
 #include "Gears.h"
 #include "LineJoint.h"
@@ -59,6 +57,7 @@
 #include "StaticEdges.h"
 #include "TheoJansen.h"
 #include "TimeOfImpact.h"
+#include "TopDownCar.h"
 #include "VaryingFriction.h"
 #include "VaryingRestitution.h"
 #include "VerticalStack.h"
@@ -68,6 +67,7 @@
 
 TestEntry g_testEntries[] =
 {
+	{"Top Down Car Test", TopDownCar::Create},
 	{"Sensor Test", SensorTest::Create},
 	{"CCD Test", CCDTest::Create},
 	{"SphereStack", SphereStack::Create},
@@ -77,8 +77,6 @@ TestEntry g_testEntries[] =
 	{"Static Edges", StaticEdges::Create},
 	{"Pyramid And Static Edges", PyramidStaticEdges::Create},
 	{"PolyCollision", PolyCollision::Create},
-	{"Dynamic Tree", DynamicTreeTest::Create},
-	{"Dynamic Edges", DynamicEdges::Create},
 	{"Line Joint", LineJoint::Create},
 	{"Pyramid", Pyramid::Create},
 	{"Prismatic", Prismatic::Create},

@@ -50,6 +50,11 @@ void BoundaryListener::Violation(b2Body* body)
 
 Test::Test()
 {
+	for(int i = 0; i < NUM_KEYS; i++)
+	{
+		keysDown[i] = false;
+	}
+
 	m_worldAABB.lowerBound.Set(-200.0f, -100.0f);
 	m_worldAABB.upperBound.Set(200.0f, 200.0f);
 	b2Vec2 gravity;

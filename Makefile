@@ -1,16 +1,18 @@
 PATCH=	box2d_fixed.patch
 
-all:
-	(cd Contrib/freeglut; make)
-	(cd Contrib/glui; make)
-	(cd Source; make)
-	(cd Examples/TestBed; make)
+all: testbed lib
+
+testbed:
+	(cd Examples/TestBed; $(MAKE) $(MFLAGS))
+
+lib:
+	(cd Source; $(MAKE) $(MFLAGS))
+
+
 
 clean:
-	(cd Contrib/freeglut; make clean)
-	(cd Contrib/glui; make clean)
-	(cd Source; make clean)
-	(cd Examples/TestBed; make clean)
+	(cd Source; $(MAKE) clean $(MFLAGS))
+	(cd Examples/TestBed; $(MAKE) clean $(MFLAGS))
 
 patch:
 	svn diff > $(PATCH)

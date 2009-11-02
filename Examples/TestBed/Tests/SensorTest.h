@@ -129,7 +129,7 @@ public:
 				break;
 			case 2:
 			case 3:
-				d.position = b2Vec2(RandomFloat() + 1, RandomFloat());
+				d.position = b2Vec2(RandomFloat() + (float32)1, RandomFloat());
 				b = m_world->CreateBody(&d);
 				b->CreateFixture(&s);
 				b->SetMassFromShapes();

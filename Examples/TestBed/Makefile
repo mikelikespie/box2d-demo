@@ -1,10 +1,10 @@
-TARGETS=	Gen/float/testbed Gen/fixed/testbed
+TARGETS=	Gen/float/testbed #Gen/fixed/testbed
 
 PROJECT=	../..
 
-CXXFLAGS=	-g -O2 -I$(PROJECT)/Contrib -I$(PROJECT)/Include -DGLUI_FREEGLUT
+CXXFLAGS=	-g -O2 -I/opt/local/include -I$(PROJECT)/Contrib -I$(PROJECT)/Include #-DGLUI_FREEGLUT
 
-LDFLAGS=	-L$(PROJECT)/Contrib/freeglut -L$(PROJECT)/Contrib/glui \
+LDFLAGS=	-L/opt/local/lib 
 
 SOURCES=	Framework/Main.cpp \
 		Framework/Test.cpp \
@@ -32,14 +32,21 @@ else
 endif
 
 
+
 FLOAT_OBJECTS= $(addprefix Gen/float/,$(SOURCES:.cpp=.o))
 
+Test/TopDownCar.h: 
+
+Gen/float/Tests/TestEntries.o: Tests/TestEntries.cpp Test/TopDownCar.h
+	mkdir -p $(dir $@)
+	c++ $(CXXFLAGS) -c -o $@ $<
+	
 Gen/float/%.o:		%.cpp
 	mkdir -p $(dir $@)
 	c++ $(CXXFLAGS) -c -o $@ $<
 
 Gen/float/testbed:	$(FLOAT_OBJECTS) $(PROJECT)/Source/Gen/float/libbox2d.a
-	g++ -o $@ $^ $(LDFLAGS) -L$(PROJECT)/Source/Gen/float -lbox2d -lglui -lglut -lGLU -lGL
+	c++ -o $@ $^ $(LDFLAGS) -L$(PROJECT)/Source/Gen/float -lbox2d -lglui -lglut -lGLU -lGL
 
 Gen/float/%.d:		%.cpp
 	@mkdir -p $(dir $@)
@@ -49,12 +56,16 @@ Gen/float/%.d:		%.cpp
 
 FIXED_OBJECTS= $(addprefix Gen/fixed/,$(SOURCES:.cpp=.o))
 
+Gen/fixed/Tests/TestEntries.o: Tests/TestEntries.cpp Test/TopDownCar.h
+	mkdir -p $(dir $@)
+	c++ $(CXXFLAGS) -DTARGET_FLOAT32_IS_FIXED -c -o $@ $<
+	
 Gen/fixed/%.o:		%.cpp
 	mkdir -p $(dir $@)
 	c++ $(CXXFLAGS) -DTARGET_FLOAT32_IS_FIXED -c -o $@ $<
 
 Gen/fixed/testbed:	$(FIXED_OBJECTS) $(PROJECT)/Source/Gen/fixed/libbox2d.a
-	g++ -rdynamic -o $@ $^ $(LDFLAGS) -L$(PROJECT)/Source/Gen/fixed -lbox2d -lglui -lglut -lGLU -lGL
+	c++ -rdynamic -o $@ $^ $(LDFLAGS) -L$(PROJECT)/Source/Gen/fixed -lbox2d -lglui -lglut -lGLU -lGL
 
 Gen/fixed/%.d:		%.cpp
 	@mkdir -p $(dir $@)
