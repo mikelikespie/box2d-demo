@@ -78,8 +78,17 @@ public:
 
 			wheels[0] = makeWheel(-1, 1, wheelDef);
 			wheels[1] = makeWheel(1, 1, wheelDef);
-			wheels[3] = makeWheel(-1, -1, wheelDef);
-			wheels[4] = makeWheel(1, -1, wheelDef);
+			wheels[2] = makeWheel(-1, -1, wheelDef);
+			wheels[3] = makeWheel(1, -1, wheelDef);
+
+			b2TensorDampingControllerDef wheelDamperDef;
+			wheelDamperDef.SetAxisAligned(1000000.0, 0.0);
+
+			b2TensorDampingController *wheelDamper = (b2TensorDampingController*)world->CreateController(&wheelDamperDef);
+
+			for (int i = 0; i < 4; i++)
+				wheelDamper->AddBody(wheels[i]);
+
 		}
 
 		{
