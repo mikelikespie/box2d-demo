@@ -57,7 +57,7 @@ public:
 			b2BodyDef chassisBd;
 
 			chassisBd.position = b2Vec2(0.0f, 0.0f);
-			chassisBd.topFriction = 5000000.0;
+			chassisBd.topFriction = 50000.0;
 
 			chassis = world->CreateBody(&chassisBd);
 

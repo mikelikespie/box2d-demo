@@ -179,29 +179,22 @@ b2Island::~b2Island()
 }
 
 // returns the force that was lost;
-static inline void fricV(b2Vec2 &v, float32 mass, float32 dt, float32 &frictionLeft)
+static inline void fricV(b2Vec2 &v, float32 mass, float32 invMass, float32 dt, float32 &frictionLeft)
 {
 	if (frictionLeft > 0.0 && dt > 0.0 && v.LengthSquared() > 0.00001)
 	{
-
-		printf("fl %f\n", (double)frictionLeft);
 		b2Vec2 momentum = mass * v;
 		b2Vec2 reverseMomentum = -momentum;
 		b2Vec2 reverseForce = (1.0/dt) * reverseMomentum;
 
 		float32 oldReverseForceLength = reverseForce.Length();
 		float32 newReverseForceLength = b2Clamp(oldReverseForceLength, -frictionLeft, frictionLeft);
-		printf("f %f,%f => ", reverseForce.x, reverseForce.y);
-		reverseForce *= newReverseForceLength/oldReverseForceLength;
-		printf("%f,%f \n", reverseForce.x, reverseForce.y);
 
-		printf("v %f,%f=>", (double)v.x, (double)v.y);
-		v += dt / mass * reverseForce ;
-		printf("%f,%f\n\n", (double)v.x, (double)v.y);
+		reverseForce *= newReverseForceLength/oldReverseForceLength;
+
+		v += dt * invMass * reverseForce;
 
 		frictionLeft -= newReverseForceLength;
-		printf(" fl %f\n", (double)frictionLeft);
-
 	}
 }
 void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSleep)
@@ -273,7 +266,7 @@ void b2Island::Solve(const b2TimeStep& step, const b2Vec2& gravity, bool allowSl
 		if (b->IsStatic())
 			continue;
 
-		fricV(b->m_linearVelocity, b->m_mass, step.dt, b->m_topFrictionLeft);
+		fricV(b->m_linearVelocity, b->m_invMass, step.dt, b->m_topFrictionLeft);
 
 		// Check for large velocities.
 		b2Vec2 translation = step.dt * b->m_linearVelocity;
