@@ -56,6 +56,7 @@ For discussion please visit http://www.box2d.org/forum
 #include "../Source/Dynamics/Joints/b2PulleyJoint.h"
 #include "../Source/Dynamics/Joints/b2RevoluteJoint.h"
 #include "../Source/Dynamics/Joints/b2FixedJoint.h"
+#include "../Source/Dynamics/Joints/b2FrictionJoint.h"
 
 
 #include "../Source/Dynamics/Controllers/b2BuoyancyController.h"

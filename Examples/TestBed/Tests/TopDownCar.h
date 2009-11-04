@@ -29,7 +29,6 @@ public:
 	float32 halfHeight;
 	float32 defaultDensity;
 	float32 defaultFriction;
-	float32 steerForce;
 	float32 accelerateForce;
 
 	b2Body* wheels[4];
@@ -45,8 +44,7 @@ public:
 		halfHeight(height/2.0f),
 		defaultDensity(20.0f),
 		defaultFriction(0.68f),
-		steerForce(200.0f),
-		accelerateForce(1500.0f),
+		accelerateForce(2500.0f),
 		world(_world),
 		frontWheelDrive(true)
 	{
@@ -57,7 +55,6 @@ public:
 			b2BodyDef chassisBd;
 
 			chassisBd.position = b2Vec2(0.0f, 0.0f);
-			chassisBd.topFriction = 50000.0;
 
 			chassis = world->CreateBody(&chassisBd);
 
@@ -72,6 +69,7 @@ public:
 			chassis->SetMassFromShapes();
 
 
+
 		}
 
 		{
@@ -84,17 +82,6 @@ public:
 			wheels[1] = makeWheel(1, 1, wheelDef);
 			wheels[2] = makeWheel(-1, -1, wheelDef);
 			wheels[3] = makeWheel(1, -1, wheelDef);
-
-	//		b2TensorDryFrictionControllerDef wheelDamperDef;
-	//		wheelDamperDef.SetAxisFrictionForce(1000000.0);
-
-	//		b2TensorDryFrictionController *wheelDamper = (b2TensorDryFrictionController*)world->CreateController(&wheelDamperDef);
-
-		//	for (int i = 0; i < 4; i++)
-		//		wheelDamper->AddBody(wheels[i]);
-
-
-
 		}
 
 		{
@@ -114,7 +101,7 @@ public:
 
 			rackDef.Initialize(w0, w1, pos0, pos1);
 
-//			world->CreateJoint(&rackDef);
+			world->CreateJoint(&rackDef);
 		}
 	}
 
@@ -135,6 +122,7 @@ public:
 			wheel->ApplyForce(force_vector, wheel->GetWorldCenter());
 		}
 	}
+
 
 	virtual ~MyCar()
 	{
@@ -159,21 +147,28 @@ private:
 
 		// If we're doing the front wheels
 		if (ymul > 0) {
-			jointDef.lowerAngle = -0.25;
-			jointDef.upperAngle = 0.25;
+			jointDef.lowerAngle = -0.25 * b2_pi;
+			jointDef.upperAngle = 0.25 * b2_pi;
 		}
 
 		jointDef.enableLimit = true;
 
-		/*	b2RevoluteJoint *joint = (b2RevoluteJoint*)world->CreateJoint(&jointDef);
+		b2RevoluteJoint *joint = (b2RevoluteJoint*)world->CreateJoint(&jointDef);
 
 		if (xmul < 0 && ymul > 0)
 		{
+
 			frontLeftJoint = joint;
 			frontLeftJoint->EnableMotor(true);
 			frontLeftJoint->SetMaxMotorTorque(5000.0f);
 		}
-*/
+
+		{
+			b2FrictionJointDef jd;
+			jd.frictionForce = b2Vec2(400.0,1.0);
+			jd.Initialize(wheel);
+			world->CreateJoint(&jd);
+		}
 		return wheel;
 	}
 
@@ -192,12 +187,15 @@ public:
 	{
 		Test::Step(settings);
 
-	/*	if (keysDown['a'])
+		m_debugDraw.DrawString(5, m_textLine, "(f) %s wheel drive", car->frontWheelDrive ? "front" : "rear");
+		m_textLine += 15;
+
+		if (keysDown['a'])
 			car->Steer(1.0f);
 		else if (keysDown['d'])
 			car->Steer(-1.0f);
 		else
-			car->Steer(0.0f);*/
+			car->Steer(0.0f);
 
 	}
 	void KeyDown(unsigned char key)
@@ -218,7 +216,16 @@ public:
 
 		}
 	}
+	void Keyboard(unsigned char key)
+	{
+		switch (key)
+		{
+		case 'f':
+			car->frontWheelDrive = !car->frontWheelDrive;
+			break;
 
+		}
+	}
 	virtual ~TopDownCar()
 	{
 		delete car;

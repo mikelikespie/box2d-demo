@@ -47,6 +47,7 @@ SOURCES = \
 	./Dynamics/Controllers/b2TensorDryFrictionController.cpp \
 	./Dynamics/Joints/b2DistanceJoint.cpp \
 	./Dynamics/Joints/b2FixedJoint.cpp \
+	./Dynamics/Joints/b2FrictionJoint.cpp \
 	./Dynamics/Joints/b2GearJoint.cpp \
 	./Dynamics/Joints/b2Joint.cpp \
 	./Dynamics/Joints/b2LineJoint.cpp \

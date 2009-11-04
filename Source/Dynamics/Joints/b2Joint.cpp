@@ -25,6 +25,7 @@
 #include "b2PulleyJoint.h"
 #include "b2GearJoint.h"
 #include "b2FixedJoint.h"
+#include "b2FrictionJoint.h"
 #include "../b2Body.h"
 #include "../b2World.h"
 #include "../../Common/b2BlockAllocator.h"
@@ -86,11 +87,16 @@ b2Joint* b2Joint::Create(const b2JointDef* def, b2BlockAllocator* allocator)
 			joint = new (mem) b2LineJoint((b2LineJointDef*)def);
 		}
 		break;
-        
+
 	case e_fixedJoint:
 		{
 			void* mem = allocator->Allocate(sizeof(b2FixedJoint));
 			joint = new (mem) b2FixedJoint((b2FixedJointDef*)def);
+		}
+	case e_frictionJoint:
+		{
+			void* mem = allocator->Allocate(sizeof(b2FrictionJoint));
+			joint = new (mem) b2FrictionJoint((b2FrictionJointDef*)def);
 		}
 		break;
 

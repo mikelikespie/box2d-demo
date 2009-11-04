@@ -209,18 +209,20 @@ b2Joint* b2World::CreateJoint(const b2JointDef* def)
 	if (j->m_body1->m_jointList) j->m_body1->m_jointList->prev = &j->m_node1;
 	j->m_body1->m_jointList = &j->m_node1;
 
-	j->m_node2.joint = j;
-	j->m_node2.other = j->m_body1;
-	j->m_node2.prev = NULL;
-	j->m_node2.next = j->m_body2->m_jointList;
-	if (j->m_body2->m_jointList) j->m_body2->m_jointList->prev = &j->m_node2;
-	j->m_body2->m_jointList = &j->m_node2;
-
+	if (j->m_body2)
+	{
+		j->m_node2.joint = j;
+		j->m_node2.other = j->m_body1;
+		j->m_node2.prev = NULL;
+		j->m_node2.next = j->m_body2->m_jointList;
+		if (j->m_body2->m_jointList) j->m_body2->m_jointList->prev = &j->m_node2;
+		j->m_body2->m_jointList = &j->m_node2;
+	}
 	// If the joint prevents collisions, then reset collision filtering.
 	if (def->collideConnected == false)
 	{
 		// Reset the proxies on the body with the minimum number of fixtures.
-		b2Body* b = def->body1->m_fixtureCount < def->body2->m_fixtureCount ? def->body1 : def->body2;
+		b2Body* b = def->body2 ? (def->body1->m_fixtureCount < def->body2->m_fixtureCount ? def->body1 : def->body2)  :def->body1;
 		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next)
 		{
 			f->RefilterProxy(m_broadPhase, b->GetXForm());
@@ -256,7 +258,8 @@ void b2World::DestroyJoint(b2Joint* j)
 
 	// Wake up connected bodies.
 	body1->WakeUp();
-	body2->WakeUp();
+	if (body2)
+		body2->WakeUp();
 
 	// Remove from body 1.
 	if (j->m_node1.prev)
@@ -277,24 +280,27 @@ void b2World::DestroyJoint(b2Joint* j)
 	j->m_node1.prev = NULL;
 	j->m_node1.next = NULL;
 
-	// Remove from body 2
-	if (j->m_node2.prev)
+	if (body2)
 	{
-		j->m_node2.prev->next = j->m_node2.next;
-	}
+		// Remove from body 2
+		if (j->m_node2.prev)
+		{
+			j->m_node2.prev->next = j->m_node2.next;
+		}
 
-	if (j->m_node2.next)
-	{
-		j->m_node2.next->prev = j->m_node2.prev;
-	}
+		if (j->m_node2.next)
+		{
+			j->m_node2.next->prev = j->m_node2.prev;
+		}
 
-	if (&j->m_node2 == body2->m_jointList)
-	{
-		body2->m_jointList = j->m_node2.next;
-	}
+		if (&j->m_node2 == body2->m_jointList)
+		{
+			body2->m_jointList = j->m_node2.next;
+		}
 
-	j->m_node2.prev = NULL;
-	j->m_node2.next = NULL;
+		j->m_node2.prev = NULL;
+		j->m_node2.next = NULL;
+	}
 
 	b2Joint::Destroy(j, &m_blockAllocator);
 
@@ -470,7 +476,7 @@ void b2World::Solve(const b2TimeStep& step)
 				jn->joint->m_islandFlag = true;
 
 				b2Body* other = jn->other;
-				if (other->m_flags & b2Body::e_islandFlag)
+				if (!other || other->m_flags & b2Body::e_islandFlag)
 				{
 					continue;
 				}
@@ -1009,6 +1015,8 @@ void b2World::DrawJoint(b2Joint* joint)
 {
 	b2Body* b1 = joint->GetBody1();
 	b2Body* b2 = joint->GetBody2();
+	if (!b2)
+		return;
 	const b2XForm& xf1 = b1->GetXForm();
 	const b2XForm& xf2 = b2->GetXForm();
 	b2Vec2 x1 = xf1.position;

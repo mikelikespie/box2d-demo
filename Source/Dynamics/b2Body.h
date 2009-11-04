@@ -354,6 +354,7 @@ private:
 	friend class b2PulleyJoint;
 	friend class b2RevoluteJoint;
 	friend class b2FixedJoint;
+	friend class b2FrictionJoint;
 
 	friend class b2Controller;
 
