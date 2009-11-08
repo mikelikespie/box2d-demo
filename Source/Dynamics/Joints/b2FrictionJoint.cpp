@@ -99,7 +99,7 @@ bool b2FrictionJoint::SolvePositionConstraints(float32 baumgarte)
 	B2_NOT_USED(baumgarte);
 
 
-	return false;
+	return true;
 
 };
 
