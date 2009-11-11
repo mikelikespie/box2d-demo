@@ -4,6 +4,8 @@
 *.log
 *.pid
 *.cache
+*.o
+*.a
 public/test
 config/database.yml
 tmp/**/*
