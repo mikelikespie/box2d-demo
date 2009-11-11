@@ -26,7 +26,6 @@
 #include "b2GearJoint.h"
 #include "b2FixedJoint.h"
 #include "b2FrictionJoint.h"
-#include "b2FrictionJoint.h"
 #include "../b2Body.h"
 #include "../b2World.h"
 #include "../../Common/b2BlockAllocator.h"

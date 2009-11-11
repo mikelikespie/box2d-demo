@@ -1,5 +1,5 @@
-#ifndef B2_LINEAR_FRICTION_JOINT_H
-#define B2_LINEAR_FRICTION_JOINT_H
+#ifndef B2_FRICTION_JOINT_H
+#define B2_FRICTION_JOINT_H
 
 #include "b2Joint.h"
 

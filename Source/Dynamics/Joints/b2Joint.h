@@ -37,8 +37,7 @@ enum b2JointType
 	e_gearJoint,
 	e_lineJoint,
     e_fixedJoint,
-    e_frictionJoint,
-    e_angularFrictionJoint
+    e_frictionJoint
 };
 
 enum b2LimitState
