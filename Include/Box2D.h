@@ -64,6 +64,5 @@ For discussion please visit http://www.box2d.org/forum
 #include "../Source/Dynamics/Controllers/b2ConstantAccelController.h"
 #include "../Source/Dynamics/Controllers/b2GravityController.h"
 #include "../Source/Dynamics/Controllers/b2TensorDampingController.h"
-#include "../Source/Dynamics/Controllers/b2TensorDryFrictionController.h"
 
 #endif
