@@ -44,7 +44,6 @@ SOURCES = \
 	./Dynamics/Controllers/b2Controller.cpp \
 	./Dynamics/Controllers/b2GravityController.cpp \
 	./Dynamics/Controllers/b2TensorDampingController.cpp \
-	./Dynamics/Controllers/b2TensorDryFrictionController.cpp \
 	./Dynamics/Joints/b2DistanceJoint.cpp \
 	./Dynamics/Joints/b2FixedJoint.cpp \
 	./Dynamics/Joints/b2FrictionJoint.cpp \

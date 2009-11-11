@@ -2,7 +2,7 @@ TARGETS=	Gen/float/testbed #Gen/fixed/testbed
 
 PROJECT=	../..
 
-CXXFLAGS=	-g -O2 -I/opt/local/include -I$(PROJECT)/Contrib -I$(PROJECT)/Include #-DGLUI_FREEGLUT
+CXXFLAGS=	-g -O2 -I/usr/lib/include -I$(PROJECT)/Contrib -I$(PROJECT)/Include -DGLUI_FREEGLUT
 
 LDFLAGS=	-L/opt/local/lib 
 

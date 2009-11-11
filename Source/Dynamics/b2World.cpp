@@ -209,7 +209,8 @@ b2Joint* b2World::CreateJoint(const b2JointDef* def)
 	if (j->m_body1->m_jointList) j->m_body1->m_jointList->prev = &j->m_node1;
 	j->m_body1->m_jointList = &j->m_node1;
 
-	if (j->m_body2)
+	// If we're a unary joint, we don't have anode 2
+	if (!j->IsUnaryJoint())
 	{
 		j->m_node2.joint = j;
 		j->m_node2.other = j->m_body1;
@@ -222,7 +223,16 @@ b2Joint* b2World::CreateJoint(const b2JointDef* def)
 	if (def->collideConnected == false)
 	{
 		// Reset the proxies on the body with the minimum number of fixtures.
-		b2Body* b = def->body2 ? (def->body1->m_fixtureCount < def->body2->m_fixtureCount ? def->body1 : def->body2)  :def->body1;
+		b2Body* b;
+		if (def->body2 == NULL || def->body1->m_fixtureCount < def->body2->m_fixtureCount)
+		{
+			b = def->body1;
+		}
+		else
+		{
+			b = def->body2;
+		}
+
 		for (b2Fixture* f = b->m_fixtureList; f; f = f->m_next)
 		{
 			f->RefilterProxy(m_broadPhase, b->GetXForm());
@@ -258,8 +268,12 @@ void b2World::DestroyJoint(b2Joint* j)
 
 	// Wake up connected bodies.
 	body1->WakeUp();
-	if (body2)
+
+	// If we're a unary joint, we don't have a body2
+	if (!j->IsUnaryJoint())
+	{
 		body2->WakeUp();
+	}
 
 	// Remove from body 1.
 	if (j->m_node1.prev)
@@ -280,7 +294,7 @@ void b2World::DestroyJoint(b2Joint* j)
 	j->m_node1.prev = NULL;
 	j->m_node1.next = NULL;
 
-	if (body2)
+	if (!j->IsUnaryJoint())
 	{
 		// Remove from body 2
 		if (j->m_node2.prev)
@@ -475,8 +489,14 @@ void b2World::Solve(const b2TimeStep& step)
 				island.Add(jn->joint);
 				jn->joint->m_islandFlag = true;
 
+				// if we're dealing with a unary joint, there will be no "other"
+				if (jn->joint->IsUnaryJoint())
+				{
+					continue;
+				}
+
 				b2Body* other = jn->other;
-				if (!other || other->m_flags & b2Body::e_islandFlag)
+				if (other->m_flags & b2Body::e_islandFlag)
 				{
 					continue;
 				}
@@ -1015,8 +1035,7 @@ void b2World::DrawJoint(b2Joint* joint)
 {
 	b2Body* b1 = joint->GetBody1();
 	b2Body* b2 = joint->GetBody2();
-	if (!b2)
-		return;
+
 	const b2XForm& xf1 = b1->GetXForm();
 	const b2XForm& xf2 = b2->GetXForm();
 	b2Vec2 x1 = xf1.position;
@@ -1096,7 +1115,7 @@ void b2World::DrawDebugData()
 	{
 		for (b2Joint* j = m_jointList; j; j = j->GetNext())
 		{
-			if (j->GetType() != e_mouseJoint)
+			if (j->GetType() != e_mouseJoint && !j->IsUnaryJoint())
 			{
 				DrawJoint(j);
 			}

@@ -137,6 +137,10 @@ public:
 	/// Set the user data pointer.
 	void SetUserData(void* data);
 
+
+	/// If there's no body2, then it's a unary joint
+	inline bool IsUnaryJoint() {return m_body2 == NULL;}
+
 	//--------------- Internals Below -------------------
 protected:
 	friend class b2World;
