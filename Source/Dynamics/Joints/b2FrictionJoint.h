@@ -1,25 +1,40 @@
-#ifndef B2_FRICTION_JOINT_H
-#define B2_FRICTION_JOINT_H
+#ifndef B2_LINEAR_FRICTION_JOINT_H
+#define B2_LINEAR_FRICTION_JOINT_H
 
 #include "b2Joint.h"
 
-/// FrictionJoint: Attaches two bodies rigidly together
+/// FrictionJoint: simulated dry friction in a direction
+/// the frictionForce is the max counterforce that can be applied
+/// to the body  (so what you'd get if you multiplied a mass by a
+/// friction coefficient).
+///
+/// To simulate tires, you'd want to set the one of the directions
+/// to a very high value, and the other to a very low value.
+///
+/// Real friction probably is more like using the same accumulator for x and y and limiting
+/// the magnitude of (x,y), but this is faster (no square roots :))
+/// and works for tires and whatnot.
+
 struct b2FrictionJointDef : public b2JointDef
 {
 	b2FrictionJointDef()
 	{
 		type = e_frictionJoint;
+		frictionForce = b2Vec2_zero;
+		frictionTorque = 0.0;
+		body2 = NULL;
 	}
 
 	b2Vec2 frictionForce;
+	float32 frictionTorque;
 
 	/// Initialize the bodies.
-	void Initialize(b2Body* body1);
+	void Initialize(b2Body* body1, const b2Vec2 &_frictionForce, const float32 _frictionTorque = 0.0f);
+	///And one if you don't need directional friction
+	void Initialize(b2Body* body1, const float32 _frictionTorque = 0.0f);
 };
 
-/// A friction joint constrains all degrees of freedom between two bodies
-/// Author: Jorrit Rouwe
-/// See: www.jrouwe.nl/frictionjoint/ for more info
+/// A friction joint is not a joint, but just a constraint that applies friction
 class b2FrictionJoint : public b2Joint
 {
 public:
@@ -40,24 +55,12 @@ public:
 	bool SolvePositionConstraints(float32 baumgarte);
 
 	b2Vec2 m_frictionForce;
-
-	// Initial state of the bodies
-	b2Vec2 m_dp;	//< Distance between body->GetXForm().position between the two bodies at rest in the reference frame of body1
-	//float32 m_a;	//< Angle between the bodies at rest
-	//b2Mat22 m_R0;	//< Rotation matrix of m_a
-
-	// Distance between center of masses for this time step (when the shapes of the bodies change, their local canters can change so we derive this from m_dp every frame)
-	b2Vec2 m_d;		//< Distance between center of masses for both bodies at rest in the reference frame of body1
-
-	// Effective mass and inertia for angle constraint
-	float32 m_mass;
-	float32 m_inertia;
+	float32 m_frictionTorque;
 
 	// Accumulated impulse for warm starting and returning the constraint force/torque
-	float32 m_lambda_a;
 	b2Vec2 m_lambda_p;
-	float32 m_lambda_p_a;
 
+	float32 m_lambda_a_p;
 };
 
 #endif

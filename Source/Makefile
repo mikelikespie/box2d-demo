@@ -46,7 +46,6 @@ SOURCES = \
 	./Dynamics/Controllers/b2TensorDampingController.cpp \
 	./Dynamics/Joints/b2DistanceJoint.cpp \
 	./Dynamics/Joints/b2FixedJoint.cpp \
-	./Dynamics/Joints/b2FrictionJoint.cpp \
 	./Dynamics/Joints/b2GearJoint.cpp \
 	./Dynamics/Joints/b2Joint.cpp \
 	./Dynamics/Joints/b2LineJoint.cpp \
@@ -54,6 +53,7 @@ SOURCES = \
 	./Dynamics/Joints/b2PrismaticJoint.cpp \
 	./Dynamics/Joints/b2PulleyJoint.cpp \
 	./Dynamics/Joints/b2RevoluteJoint.cpp \
+	./Dynamics/Joints/b2FrictionJoint.cpp \
 
 #	./Contrib/b2Polygon.cpp \
 #	./Contrib/b2Triangle.cpp

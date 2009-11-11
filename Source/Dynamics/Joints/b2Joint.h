@@ -37,7 +37,8 @@ enum b2JointType
 	e_gearJoint,
 	e_lineJoint,
     e_fixedJoint,
-    e_frictionJoint
+    e_frictionJoint,
+    e_angularFrictionJoint
 };
 
 enum b2LimitState
@@ -139,7 +140,7 @@ public:
 
 
 	/// If there's no body2, then it's a unary joint
-	inline bool IsUnaryJoint() {return m_body2 == NULL;}
+	inline bool IsUnaryJoint() const {return m_body2 == NULL;}
 
 	//--------------- Internals Below -------------------
 protected:

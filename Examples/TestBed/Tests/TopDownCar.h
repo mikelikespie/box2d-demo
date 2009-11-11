@@ -165,8 +165,8 @@ private:
 
 		{
 			b2FrictionJointDef jd;
-			jd.frictionForce = b2Vec2(400.0,1.0);
-			jd.Initialize(wheel);
+
+			jd.Initialize(wheel, b2Vec2(400.0,1.0));
 			world->CreateJoint(&jd);
 		}
 		return wheel;

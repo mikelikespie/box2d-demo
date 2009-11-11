@@ -26,6 +26,7 @@
 #include "b2GearJoint.h"
 #include "b2FixedJoint.h"
 #include "b2FrictionJoint.h"
+#include "b2FrictionJoint.h"
 #include "../b2Body.h"
 #include "../b2World.h"
 #include "../../Common/b2BlockAllocator.h"
@@ -93,13 +94,13 @@ b2Joint* b2Joint::Create(const b2JointDef* def, b2BlockAllocator* allocator)
 			void* mem = allocator->Allocate(sizeof(b2FixedJoint));
 			joint = new (mem) b2FixedJoint((b2FixedJointDef*)def);
 		}
+		break;
 	case e_frictionJoint:
 		{
 			void* mem = allocator->Allocate(sizeof(b2FrictionJoint));
 			joint = new (mem) b2FrictionJoint((b2FrictionJointDef*)def);
 		}
 		break;
-
 	default:
 		b2Assert(false);
 		break;
@@ -143,6 +144,10 @@ void b2Joint::Destroy(b2Joint* joint, b2BlockAllocator* allocator)
     
 	case e_fixedJoint:
 		allocator->Free(joint, sizeof(b2FixedJoint));
+		break;
+
+	case e_frictionJoint:
+		allocator->Free(joint, sizeof(b2FrictionJoint));
 		break;
 
 	default:
